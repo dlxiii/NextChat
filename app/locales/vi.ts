@@ -26,6 +26,8 @@ const vi: PartialLocaleType = {
     Later: "Để sau",
     Return: "Trở lại",
     SaasTips: "Cấu hình quá phức tạp, tôi muốn sử dụng ngay lập tức",
+    TermsOfUse: "Điều khoản sử dụng",
+    PrivacyPolicy: "Chính sách quyền riêng tư",
     TopTips:
       "🥳 Ưu đãi ra mắt NextChat AI, mở khóa OpenAI o1, GPT-4o, Claude-3.5 và các mô hình lớn mới nhất ngay bây giờ",
   },

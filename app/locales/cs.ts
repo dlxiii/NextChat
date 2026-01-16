@@ -26,6 +26,8 @@ const cs: PartialLocaleType = {
     Later: "Později",
     Return: "Návrat",
     SaasTips: "Konfigurace je příliš složitá, chci okamžitě začít používat",
+    TermsOfUse: "Podmínky použití",
+    PrivacyPolicy: "Zásady ochrany soukromí",
     TopTips:
       "🥳 Uvítací nabídka NextChat AI, okamžitě odemkněte OpenAI o1, GPT-4o, Claude-3.5 a nejnovější velké modely",
   },

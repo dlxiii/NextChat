@@ -27,6 +27,8 @@ const sk: PartialLocaleType = {
     Later: "Neskôr",
     Return: "Návrat",
     SaasTips: "Nastavenie je príliš zložité, chcem to okamžite použiť",
+    TermsOfUse: "Podmienky používania",
+    PrivacyPolicy: "Zásady ochrany súkromia",
     TopTips:
       "🥳 Uvítacia ponuka NextChat AI, okamžite odomknite OpenAI o1, GPT-4o, Claude-3.5 a najnovšie veľké modely",
   },

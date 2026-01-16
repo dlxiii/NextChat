@@ -27,6 +27,8 @@ const fr: PartialLocaleType = {
     Return: "Retour",
     SaasTips:
       "La configuration est trop compliquée, je veux l'utiliser immédiatement",
+    TermsOfUse: "Conditions d'utilisation",
+    PrivacyPolicy: "Politique de confidentialité",
     TopTips:
       "🥳 Offre de lancement NextChat AI, débloquez OpenAI o1, GPT-4o, Claude-3.5 et les derniers grands modèles",
   },

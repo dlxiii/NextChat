@@ -122,6 +122,15 @@ export function AuthPage() {
           }}
         />
       </div>
+      <div className={styles["auth-footer"]}>
+        <a className={styles["auth-footer-link"]} href="/#/terms">
+          {Locale.Auth.TermsOfUse}
+        </a>
+        <span className={styles["auth-footer-divider"]}>|</span>
+        <a className={styles["auth-footer-link"]} href="/#/privacy">
+          {Locale.Auth.PrivacyPolicy}
+        </a>
+      </div>
     </div>
   );
 }

@@ -26,6 +26,8 @@ const tr: PartialLocaleType = {
     Later: "Sonra",
     Return: "Geri",
     SaasTips: "Ayarlar çok karmaşık, hemen kullanmak istiyorum",
+    TermsOfUse: "Kullanım Şartları",
+    PrivacyPolicy: "Gizlilik Politikası",
     TopTips:
       "🥳 NextChat AI lansman teklifi, OpenAI o1, GPT-4o, Claude-3.5 ve en son büyük modelleri şimdi açın",
   },

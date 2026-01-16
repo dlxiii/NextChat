@@ -26,6 +26,8 @@ const id: PartialLocaleType = {
     Later: "Nanti",
     Return: "Kembali",
     SaasTips: "Konfigurasi terlalu rumit, saya ingin menggunakannya segera",
+    TermsOfUse: "Ketentuan Penggunaan",
+    PrivacyPolicy: "Kebijakan Privasi",
     TopTips:
       "🥳 Penawaran Peluncuran NextChat AI, buka OpenAI o1, GPT-4o, Claude-3.5 dan model besar terbaru sekarang",
   },
