@@ -30,7 +30,7 @@ const tw = {
       "🥳 NextChat AI 首發優惠，立刻解鎖 OpenAI o1, GPT-4o, Claude-3.5 等最新的大型語言模型",
   },
   AuthCredential: {
-    HeroTitle: "歡迎回來，使用 Hexagram",
+    HeroTitle: "歡迎回來",
   },
 
   ChatItem: {

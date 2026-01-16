@@ -28,7 +28,7 @@ const da: PartialLocaleType = {
     SaasTips: "Hvis det er for svært, kan du starte nu",
   },
   AuthCredential: {
-    HeroTitle: "Velkommen tilbage til Hexagram",
+    HeroTitle: "Velkommen tilbage",
   },
 
   ChatItem: {
