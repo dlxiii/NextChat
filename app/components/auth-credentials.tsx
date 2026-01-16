@@ -153,18 +153,7 @@ export function AuthCredentialsPage() {
             </div>
 
             <div className={styles["auth-credentials-oauth"]}>
-              <IconButton
-                text={Locale.AuthCredential.OAuthGoogle}
-                disabled
-              />
-              <IconButton
-                text={Locale.AuthCredential.OAuthGithub}
-                disabled
-              />
-              <IconButton
-                text={Locale.AuthCredential.OAuthMicrosoft}
-                disabled
-              />
+              <IconButton text={Locale.AuthCredential.OAuthGoogle} disabled />
             </div>
 
             <button
