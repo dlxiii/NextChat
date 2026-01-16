@@ -238,14 +238,6 @@ export function AuthCredentialsPage() {
                 disabled
               />
             </div>
-
-            <button
-              type="button"
-              className={styles["auth-credentials-backup"]}
-              onClick={() => navigate(Path.AuthBackup)}
-            >
-              {Locale.AuthCredential.BackupLink}
-            </button>
           </form>
         </section>
       </main>
