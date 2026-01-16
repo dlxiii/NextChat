@@ -13,7 +13,7 @@ const cn = {
        \\ 2️⃣ 如果你想消耗自己的 OpenAI 资源，点击[这里](/#/settings)修改设置 ⚙️`
       : `😆 对话遇到了一些问题，不用慌:
        \ 1️⃣ 想要零配置开箱即用，[点击这里立刻开启对话 🚀](${SAAS_CHAT_UTM_URL})
-       \ 2️⃣ 如果你正在使用私有部署版本，点击[这里](/#/auth-backup)输入访问秘钥 🔑
+       \ 2️⃣ 如果你正在使用私有部署版本，点击[这里](/#/auth)输入访问秘钥 🔑
        \ 3️⃣ 如果你想消耗自己的 OpenAI 资源，点击[这里](/#/settings)修改设置 ⚙️
        `,
   },
@@ -31,9 +31,6 @@ const cn = {
   },
   AuthCredential: {
     HeroTitle: "欢迎回来，使用 Hexagram",
-    HeroSubtitle: "使用邮箱与密码登录继续使用。",
-    HeroNote: "OAuth 登录即将上线。",
-    ApiHint: "后端 API 占位地址：",
     Title: "邮箱登录",
     Subtitle: "使用账号凭据进入你的工作区。",
     EmailLabel: "邮箱地址",
