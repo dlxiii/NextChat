@@ -24,7 +24,6 @@ import {
 } from "react-router-dom";
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
-import { AuthPage } from "./auth";
 import { AuthCredentialsPage } from "./auth-credentials";
 import { getClientConfig } from "../config/client";
 import { type ClientApi, getClientApi } from "../client/api";
@@ -164,7 +163,6 @@ function Screen() {
   const isArtifact = location.pathname.includes(Path.Artifacts);
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
-  const isAuthBackup = location.pathname === Path.AuthBackup;
   const isSd = location.pathname === Path.Sd;
   const isSdNew = location.pathname === Path.SdNew;
 
@@ -185,7 +183,6 @@ function Screen() {
   }
   const renderContent = () => {
     if (isAuth) return <AuthCredentialsPage />;
-    if (isAuthBackup) return <AuthPage />;
     if (isSd) return <Sd />;
     if (isSdNew) return <Sd />;
     return (
