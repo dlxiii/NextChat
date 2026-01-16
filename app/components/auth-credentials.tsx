@@ -72,16 +72,6 @@ export function AuthCredentialsPage() {
             <div className={styles["auth-credentials-hero-title"]}>
               {Locale.AuthCredential.HeroTitle}
             </div>
-            <div className={styles["auth-credentials-hero-subtitle"]}>
-              {Locale.AuthCredential.HeroSubtitle}
-            </div>
-            <div className={styles["auth-credentials-hero-note"]}>
-              {Locale.AuthCredential.HeroNote}
-            </div>
-            <div className={styles["auth-credentials-api-hint"]}>
-              {Locale.AuthCredential.ApiHint}
-              <code>{ApiPath.AuthLogin}</code>
-            </div>
           </div>
           <form
             className={styles["auth-credentials-form"]}

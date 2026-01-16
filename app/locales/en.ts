@@ -14,7 +14,7 @@ const en: LocaleType = {
      \\ 2️⃣ Want to use your own OpenAI resources? [Click here](/#/settings) to change settings ⚙️`
       : `😆 Oops, there's an issue. Let's fix it:
      \ 1️⃣ New here? [Click to start chatting now 🚀](${SAAS_CHAT_UTM_URL})
-     \ 2️⃣ Using a private setup? [Click here](/#/auth-backup) to enter your key 🔑
+     \ 2️⃣ Using a private setup? [Click here](/#/auth) to enter your key 🔑
      \ 3️⃣ Want to use your own OpenAI resources? [Click here](/#/settings) to change settings ⚙️
      `,
   },
@@ -32,9 +32,6 @@ const en: LocaleType = {
   },
   AuthCredential: {
     HeroTitle: "Welcome back to Hexagram",
-    HeroSubtitle: "Sign in with email and password to continue.",
-    HeroNote: "OAuth providers will be available soon.",
-    ApiHint: "Backend API placeholder:",
     Title: "Email Sign In",
     Subtitle: "Use your credential login to access your workspace.",
     EmailLabel: "Email Address",
