@@ -14,7 +14,7 @@ const en: LocaleType = {
      \\ 2️⃣ Want to use your own OpenAI resources? [Click here](/#/settings) to change settings ⚙️`
       : `😆 Oops, there's an issue. Let's fix it:
      \ 1️⃣ New here? [Click to start chatting now 🚀](${SAAS_CHAT_UTM_URL})
-     \ 2️⃣ Using a private setup? [Click here](/#/auth) to enter your key 🔑
+     \ 2️⃣ Using a private setup? [Click here](/#/auth-backup) to enter your key 🔑
      \ 3️⃣ Want to use your own OpenAI resources? [Click here](/#/settings) to change settings ⚙️
      `,
   },
@@ -29,6 +29,31 @@ const en: LocaleType = {
     SaasTips: "Too Complex, Use Immediately Now",
     TopTips:
       "🥳 NextChat AI launch promotion: Instantly unlock the latest models like OpenAI o1, GPT-4o, Claude-3.5!",
+  },
+  AuthCredential: {
+    HeroTitle: "Welcome back to NextChat",
+    HeroSubtitle: "Sign in with email and password to continue.",
+    HeroNote: "OAuth providers will be available soon.",
+    ApiHint: "Backend API placeholder:",
+    Title: "Email Sign In",
+    Subtitle: "Use your credential login to access your workspace.",
+    EmailLabel: "Email Address",
+    EmailPlaceholder: "name@company.com",
+    PasswordLabel: "Password",
+    PasswordPlaceholder: "Enter your password",
+    Remember: "Remember me",
+    Forgot: "Forgot password?",
+    ForgotHint: "Connect your password reset flow later.",
+    Submit: "Sign In",
+    Submitting: "Signing In...",
+    Divider: "Or continue with",
+    OAuthGoogle: "Google (coming soon)",
+    OAuthGithub: "GitHub (coming soon)",
+    OAuthMicrosoft: "Microsoft (coming soon)",
+    BackupLink: "Use the legacy access-code page instead",
+    Validation: "Please fill in email and password.",
+    Success: "Signed in (placeholder).",
+    Failed: "Sign in failed. Please verify the backend API.",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} messages`,

@@ -49,6 +49,7 @@ export enum Path {
   Masks = "/masks",
   Plugins = "/plugins",
   Auth = "/auth",
+  AuthBackup = "/auth-backup",
   Sd = "/sd",
   SdNew = "/sd-new",
   Artifacts = "/artifacts",
@@ -75,6 +76,7 @@ export enum ApiPath {
   DeepSeek = "/api/deepseek",
   SiliconFlow = "/api/siliconflow",
   "302.AI" = "/api/302ai",
+  AuthLogin = "/api/auth/login",
 }
 
 export enum SlotID {
