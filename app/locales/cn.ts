@@ -30,7 +30,7 @@ const cn = {
       "🥳 NextChat AI 首发优惠，立刻解锁 OpenAI o1, GPT-4o, Claude-3.5 等最新大模型",
   },
   AuthCredential: {
-    HeroTitle: "欢迎回来，使用 NextChat",
+    HeroTitle: "欢迎回来，使用 Hexagram",
     HeroSubtitle: "使用邮箱与密码登录继续使用。",
     HeroNote: "OAuth 登录即将上线。",
     ApiHint: "后端 API 占位地址：",

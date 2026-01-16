@@ -29,6 +29,10 @@ const tr: PartialLocaleType = {
     TopTips:
       "🥳 NextChat AI lansman teklifi, OpenAI o1, GPT-4o, Claude-3.5 ve en son büyük modelleri şimdi açın",
   },
+  AuthCredential: {
+    HeroTitle: "Hexagram'e tekrar hoş geldiniz",
+  },
+
   ChatItem: {
     ChatItemCount: (count: number) => `${count} konuşma`,
   },

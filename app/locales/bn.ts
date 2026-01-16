@@ -29,6 +29,10 @@ const bn: PartialLocaleType = {
     TopTips:
       "🥳 NextChat AI প্রথম প্রকাশের অফার, এখনই OpenAI o1, GPT-4o, Claude-3.5 এবং সর্বশেষ বড় মডেলগুলি আনলক করুন",
   },
+  AuthCredential: {
+    HeroTitle: "Hexagram-এ আবার স্বাগতম",
+  },
+
   ChatItem: {
     ChatItemCount: (count: number) => `${count} টি চ্যাট`,
   },

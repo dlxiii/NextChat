@@ -29,6 +29,10 @@ const ru: PartialLocaleType = {
     TopTips:
       "🥳 Предложение по запуску NextChat AI: разблокируйте OpenAI o1, GPT-4o, Claude-3.5 и новейшие большие модели прямо сейчас",
   },
+  AuthCredential: {
+    HeroTitle: "С возвращением в Hexagram",
+  },
+
   ChatItem: {
     ChatItemCount: (count: number) => `${count} бесед`,
   },

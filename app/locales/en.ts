@@ -31,7 +31,7 @@ const en: LocaleType = {
       "🥳 NextChat AI launch promotion: Instantly unlock the latest models like OpenAI o1, GPT-4o, Claude-3.5!",
   },
   AuthCredential: {
-    HeroTitle: "Welcome back to NextChat",
+    HeroTitle: "Welcome back to Hexagram",
     HeroSubtitle: "Sign in with email and password to continue.",
     HeroNote: "OAuth providers will be available soon.",
     ApiHint: "Backend API placeholder:",
