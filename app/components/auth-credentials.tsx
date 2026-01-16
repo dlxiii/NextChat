@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { ApiPath, Path } from "../constant";
 import Locale from "../locales";
 import LeftIcon from "../icons/left.svg";
-import BotIcon from "../icons/bot.svg";
 import { PasswordInput } from "./ui-lib";
 import clsx from "clsx";
 
@@ -116,14 +115,6 @@ export function AuthCredentialsPage() {
       </header>
       <main className={styles["auth-credentials-body"]}>
         <section className={styles["auth-credentials-card"]}>
-          <div className={styles["auth-credentials-hero"]}>
-            <div className={clsx("no-dark", styles["auth-credentials-logo"])}>
-              <BotIcon />
-            </div>
-            <div className={styles["auth-credentials-hero-title"]}>
-              {Locale.AuthCredential.HeroTitle}
-            </div>
-          </div>
           <form
             className={styles["auth-credentials-form"]}
             onSubmit={handleSubmit}
