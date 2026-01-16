@@ -26,6 +26,8 @@ const da: PartialLocaleType = {
     Confirm: "OK",
     Later: "Senere",
     SaasTips: "Hvis det er for svært, kan du starte nu",
+    TermsOfUse: "Vilkår for brug",
+    PrivacyPolicy: "Privatlivspolitik",
   },
   AuthCredential: {
     HeroTitle: "Velkommen tilbage",

@@ -27,6 +27,8 @@ const en: LocaleType = {
     Confirm: "Confirm",
     Later: "Later",
     SaasTips: "Too Complex, Use Immediately Now",
+    TermsOfUse: "Terms of Use",
+    PrivacyPolicy: "Privacy Policy",
     TopTips:
       "🥳 NextChat AI launch promotion: Instantly unlock the latest models like OpenAI o1, GPT-4o, Claude-3.5!",
   },
