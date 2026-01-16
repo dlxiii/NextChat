@@ -142,6 +142,9 @@ const cs: PartialLocaleType = {
     DeleteToast: "Konverzace byla smazána",
     Revert: "Vrátit",
   },
+  Sidebar: {
+    Overview: "Přehled",
+  },
   Settings: {
     Title: "Nastavení",
     SubTitle: "Všechny možnosti nastavení",

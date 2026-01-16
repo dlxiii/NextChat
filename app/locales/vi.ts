@@ -142,6 +142,9 @@ const vi: PartialLocaleType = {
     DeleteToast: "Đã xóa cuộc trò chuyện",
     Revert: "Hoàn tác",
   },
+  Sidebar: {
+    Overview: "Tổng quan",
+  },
   Settings: {
     Title: "Cài đặt",
     SubTitle: "Tất cả các tùy chọn cài đặt",

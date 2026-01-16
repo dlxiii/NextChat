@@ -148,6 +148,9 @@ const it: PartialLocaleType = {
     DeleteToast: "Conversazione eliminata",
     Revert: "Annulla",
   },
+  Sidebar: {
+    Overview: "Panoramica",
+  },
   Settings: {
     Title: "Impostazioni",
     SubTitle: "Tutte le opzioni di impostazione",

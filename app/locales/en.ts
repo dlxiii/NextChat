@@ -193,6 +193,9 @@ const en: LocaleType = {
     DeleteToast: "Chat Deleted",
     Revert: "Revert",
   },
+  Sidebar: {
+    Overview: "Overview",
+  },
   Settings: {
     Title: "Settings",
     SubTitle: "All Settings",

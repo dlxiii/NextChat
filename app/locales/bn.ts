@@ -142,6 +142,9 @@ const bn: PartialLocaleType = {
     DeleteToast: "চ্যাট মুছে ফেলা হয়েছে",
     Revert: "পূর্বাবস্থায় ফেরান",
   },
+  Sidebar: {
+    Overview: "সংক্ষিপ্ত পরিচিতি",
+  },
   Settings: {
     Title: "সেটিংস",
     SubTitle: "সমস্ত সেটিংস অপশন",

@@ -144,6 +144,9 @@ const sk: PartialLocaleType = {
     DeleteToast: "Chat vymazaný",
     Revert: "Vrátiť späť",
   },
+  Sidebar: {
+    Overview: "Prehľad",
+  },
   Settings: {
     Title: "Nastavenia",
     SubTitle: "Všetky nastavenia",

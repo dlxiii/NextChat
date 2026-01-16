@@ -142,6 +142,9 @@ const ar: PartialLocaleType = {
     DeleteToast: "تم حذف المحادثة",
     Revert: "تراجع",
   },
+  Sidebar: {
+    Overview: "نظرة عامة",
+  },
   Settings: {
     Title: "الإعدادات",
     SubTitle: "جميع خيارات الإعدادات",

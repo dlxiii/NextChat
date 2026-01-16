@@ -191,6 +191,9 @@ const cn = {
     DeleteToast: "已删除会话",
     Revert: "撤销",
   },
+  Sidebar: {
+    Overview: "简介",
+  },
   Settings: {
     Title: "设置",
     SubTitle: "所有设置选项",

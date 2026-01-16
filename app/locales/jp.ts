@@ -142,6 +142,9 @@ const jp: PartialLocaleType = {
     DeleteToast: "会話を削除しました",
     Revert: "元に戻す",
   },
+  Sidebar: {
+    Overview: "概要",
+  },
   Settings: {
     Title: "設定",
     SubTitle: "すべての設定オプション",

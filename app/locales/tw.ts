@@ -151,6 +151,9 @@ const tw = {
     DeleteToast: "已刪除對話",
     Revert: "撤銷",
   },
+  Sidebar: {
+    Overview: "簡介",
+  },
   Settings: {
     Title: "設定",
     SubTitle: "設定選項",
