@@ -146,6 +146,9 @@ const no: PartialLocaleType = {
     DeleteToast: "Samtale slettet",
     Revert: "Angre",
   },
+  Sidebar: {
+    Overview: "Oversikt",
+  },
   Settings: {
     Title: "Innstillinger",
     SubTitle: "Alle innstillingsalternativer",

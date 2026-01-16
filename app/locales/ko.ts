@@ -161,6 +161,9 @@ const ko: PartialLocaleType = {
     DeleteToast: "대화가 삭제되었습니다.",
     Revert: "되돌리기",
   },
+  Sidebar: {
+    Overview: "개요",
+  },
   Settings: {
     Title: "설정",
     SubTitle: "모든 설정 옵션",

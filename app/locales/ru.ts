@@ -142,6 +142,9 @@ const ru: PartialLocaleType = {
     DeleteToast: "Беседа удалена",
     Revert: "Отменить",
   },
+  Sidebar: {
+    Overview: "Обзор",
+  },
   Settings: {
     Title: "Настройки",
     SubTitle: "Все параметры настроек",

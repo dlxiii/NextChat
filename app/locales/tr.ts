@@ -142,6 +142,9 @@ const tr: PartialLocaleType = {
     DeleteToast: "Sohbet silindi",
     Revert: "Geri al",
   },
+  Sidebar: {
+    Overview: "Genel Bakış",
+  },
   Settings: {
     Title: "Ayarlar",
     SubTitle: "Tüm ayar seçenekleri",

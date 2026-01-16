@@ -143,6 +143,9 @@ const pt: PartialLocaleType = {
     DeleteToast: "Chat Deletado",
     Revert: "Reverter",
   },
+  Sidebar: {
+    Overview: "Visão geral",
+  },
   Settings: {
     Title: "Configurações",
     SubTitle: "Todas as Configurações",

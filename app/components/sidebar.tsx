@@ -11,9 +11,9 @@ import McpIcon from "../icons/mcp.svg";
 import DragIcon from "../icons/drag.svg";
 /*
 import GithubIcon from "../icons/github.svg";
-import MaskIcon from "../icons/mask.svg";
 import DiscoveryIcon from "../icons/discovery.svg";
 */
+import MaskIcon from "../icons/mask.svg";
 
 import Locale from "../locales";
 
@@ -260,10 +260,9 @@ export function SideBar(props: { className?: string }) {
         shouldNarrow={shouldNarrow}
       >
         <div className={styles["sidebar-header-bar"]}>
-          {/*
           <IconButton
             icon={<MaskIcon />}
-            text={shouldNarrow ? undefined : Locale.Mask.Name}
+            text={shouldNarrow ? undefined : Locale.Sidebar.Overview}
             className={styles["sidebar-bar-button"]}
             onClick={() => {
               if (config.dontShowMaskSplashScreen !== true) {
@@ -274,7 +273,6 @@ export function SideBar(props: { className?: string }) {
             }}
             shadow
           />
-          */}
           {mcpEnabled && (
             <IconButton
               icon={<McpIcon />}

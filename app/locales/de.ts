@@ -144,6 +144,9 @@ const de: PartialLocaleType = {
     DeleteToast: "Gespräch gelöscht",
     Revert: "Rückgängig machen",
   },
+  Sidebar: {
+    Overview: "Übersicht",
+  },
   Settings: {
     Title: "Einstellungen",
     SubTitle: "Alle Einstellungsmöglichkeiten",

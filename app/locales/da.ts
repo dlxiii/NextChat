@@ -162,6 +162,9 @@ const da: PartialLocaleType = {
     DeleteToast: "Chat slettet",
     Revert: "Fortryd",
   },
+  Sidebar: {
+    Overview: "Oversigt",
+  },
   Settings: {
     Title: "Indstillinger",
     SubTitle: "Alle indstillinger",

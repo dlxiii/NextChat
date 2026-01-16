@@ -142,6 +142,9 @@ const id: PartialLocaleType = {
     DeleteToast: "Percakapan telah dihapus",
     Revert: "Batalkan",
   },
+  Sidebar: {
+    Overview: "Ikhtisar",
+  },
   Settings: {
     Title: "Pengaturan",
     SubTitle: "Semua opsi pengaturan",
