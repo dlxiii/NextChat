@@ -30,6 +30,10 @@ const fr: PartialLocaleType = {
     TopTips:
       "🥳 Offre de lancement NextChat AI, débloquez OpenAI o1, GPT-4o, Claude-3.5 et les derniers grands modèles",
   },
+  AuthCredential: {
+    HeroTitle: "Bon retour sur Hexagram",
+  },
+
   ChatItem: {
     ChatItemCount: (count: number) => `${count} conversations`,
   },

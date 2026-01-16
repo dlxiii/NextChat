@@ -29,6 +29,10 @@ const vi: PartialLocaleType = {
     TopTips:
       "🥳 Ưu đãi ra mắt NextChat AI, mở khóa OpenAI o1, GPT-4o, Claude-3.5 và các mô hình lớn mới nhất ngay bây giờ",
   },
+  AuthCredential: {
+    HeroTitle: "Chào mừng trở lại với Hexagram",
+  },
+
   ChatItem: {
     ChatItemCount: (count: number) => `${count} cuộc trò chuyện`,
   },

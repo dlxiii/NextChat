@@ -30,6 +30,10 @@ const de: PartialLocaleType = {
     TopTips:
       "🥳 NextChat AI Einführungsangebot, schalte jetzt OpenAI o1, GPT-4o, Claude-3.5 und die neuesten großen Modelle frei",
   },
+  AuthCredential: {
+    HeroTitle: "Willkommen zurück bei Hexagram",
+  },
+
   ChatItem: {
     ChatItemCount: (count: number) => `${count} Gespräche`,
   },
@@ -437,7 +441,8 @@ const de: PartialLocaleType = {
       AI302: {
         ApiKey: {
           Title: "Schnittstellenschlüssel",
-          SubTitle: "Verwenden Sie einen benutzerdefinierten 302.AI API-Schlüssel",
+          SubTitle:
+            "Verwenden Sie einen benutzerdefinierten 302.AI API-Schlüssel",
           Placeholder: "302.AI API-Schlüssel",
         },
         Endpoint: {

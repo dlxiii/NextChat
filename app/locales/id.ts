@@ -29,6 +29,10 @@ const id: PartialLocaleType = {
     TopTips:
       "🥳 Penawaran Peluncuran NextChat AI, buka OpenAI o1, GPT-4o, Claude-3.5 dan model besar terbaru sekarang",
   },
+  AuthCredential: {
+    HeroTitle: "Selamat datang kembali di Hexagram",
+  },
+
   ChatItem: {
     ChatItemCount: (count: number) => `${count} percakapan`,
   },

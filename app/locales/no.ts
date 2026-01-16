@@ -30,6 +30,10 @@ const no: PartialLocaleType = {
     TopTips:
       "🥳 NextChat AI lanseringstilbud, lås opp OpenAI o1, GPT-4o, Claude-3.5 og de nyeste store modellene nå",
   },
+  AuthCredential: {
+    HeroTitle: "Velkomen tilbake til Hexagram",
+  },
+
   ChatItem: {
     ChatItemCount: (count: number) => `${count} samtaler`,
   },

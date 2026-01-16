@@ -30,6 +30,10 @@ const sk: PartialLocaleType = {
     TopTips:
       "🥳 Uvítacia ponuka NextChat AI, okamžite odomknite OpenAI o1, GPT-4o, Claude-3.5 a najnovšie veľké modely",
   },
+  AuthCredential: {
+    HeroTitle: "Vitajte späť v Hexagram",
+  },
+
   ChatItem: {
     ChatItemCount: (count: number) => `${count} správ`,
   },
