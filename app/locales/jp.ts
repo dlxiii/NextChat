@@ -30,7 +30,7 @@ const jp: PartialLocaleType = {
       "🥳 NextChat AIの発売特典で、OpenAI o1、GPT-4o、Claude-3.5などの最新の大規模モデルを今すぐアンロック",
   },
   AuthCredential: {
-    HeroTitle: "Hexagramへおかえりなさい",
+    HeroTitle: "おかえりなさい",
   },
 
   ChatItem: {

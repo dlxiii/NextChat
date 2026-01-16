@@ -31,7 +31,7 @@ const es: PartialLocaleType = {
       "🥳 Oferta de lanzamiento de NextChat AI, desbloquea OpenAI o1, GPT-4o, Claude-3.5 y los últimos grandes modelos",
   },
   AuthCredential: {
-    HeroTitle: "Bienvenido de nuevo a Hexagram",
+    HeroTitle: "Bienvenido de nuevo",
   },
 
   ChatItem: {

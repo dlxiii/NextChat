@@ -30,7 +30,7 @@ const ko: PartialLocaleType = {
       "🥳 NextChat AI 출시 기념 할인: 지금 OpenAI o1, GPT-4o, Claude-3.5 및 최신 대형 모델을 사용해보세요!",
   },
   AuthCredential: {
-    HeroTitle: "Hexagram에 다시 오신 것을 환영합니다",
+    HeroTitle: "다시 오신 것을 환영합니다",
   },
 
   ChatItem: {

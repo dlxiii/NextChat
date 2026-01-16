@@ -30,7 +30,7 @@ const ar: PartialLocaleType = {
       "🥳 عرض NextChat AI الأول، افتح الآن OpenAI o1, GPT-4o, Claude-3.5 وأحدث النماذج الكبيرة",
   },
   AuthCredential: {
-    HeroTitle: "مرحبًا بعودتك إلى Hexagram",
+    HeroTitle: "مرحبًا بعودتك",
   },
 
   ChatItem: {

@@ -30,7 +30,7 @@ const cs: PartialLocaleType = {
       "🥳 Uvítací nabídka NextChat AI, okamžitě odemkněte OpenAI o1, GPT-4o, Claude-3.5 a nejnovější velké modely",
   },
   AuthCredential: {
-    HeroTitle: "Vítejte zpět v Hexagramu",
+    HeroTitle: "Vítejte zpět",
   },
 
   ChatItem: {
