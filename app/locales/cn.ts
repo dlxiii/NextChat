@@ -62,6 +62,13 @@ const cn = {
     RegisterMismatch: "两次输入的密码不一致。",
     Success: "登录成功（占位提示）。",
     RegisterSuccess: "注册成功（占位提示）。",
+    RegisterSuccessTitle: "验证邮箱",
+    RegisterSuccessSubtitle:
+      "我们已通过 Resend 向你发送验证邮件，请在邮箱中完成账户验证。",
+    RegisterSuccessHint: "如果没有看到邮件，请检查垃圾箱或稍后再试。",
+    RegisterSuccessCountdown: (seconds: number) =>
+      `${seconds} 秒后返回登录页。`,
+    RegisterSuccessAction: "返回登录",
     Failed: "登录失败，请检查后端 API。",
     RegisterFailed: "注册失败，请检查后端 API。",
   },
