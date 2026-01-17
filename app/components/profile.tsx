@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import styles from "./profile.module.scss";
 
@@ -12,11 +12,9 @@ import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import { Avatar, AvatarPicker } from "./emoji";
 import { useAppConfig } from "../store";
+import { getAuthSession } from "../utils/auth-session";
 
 const PROFILE_ITEMS = [
-  { label: "注册邮箱", value: "user@hexagram.ai" },
-  { label: "付费等级", value: "Free" },
-  { label: "服务等级", value: "Standard" },
   { label: "性别", value: "未设置" },
   { label: "年龄", value: "未设置" },
   { label: "偏好语言", value: "中文" },
@@ -27,6 +25,29 @@ export function Profile() {
   const navigate = useNavigate();
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const config = useAppConfig();
+  const authSession = getAuthSession();
+  const isLoggedIn = Boolean(authSession?.accessToken);
+  const email = authSession?.email?.trim() || "未登录";
+  const paidLevel = isLoggedIn ? authSession?.plan ?? "未设置" : "未登录";
+  const serviceLevel = isLoggedIn
+    ? authSession?.roles?.length
+      ? authSession.roles.join(", ")
+      : "未设置"
+    : "未登录";
+  const emailSubtitle = useMemo(() => {
+    if (isLoggedIn) {
+      return email;
+    }
+    return (
+      <button
+        type="button"
+        className={styles["login-link"]}
+        onClick={() => navigate(Path.Auth)}
+      >
+        登录
+      </button>
+    );
+  }, [email, isLoggedIn, navigate]);
 
   return (
     <ErrorBoundary>
@@ -88,6 +109,13 @@ export function Profile() {
               </div>
             </Popover>
           </ListItem>
+          <ListItem
+            title="注册邮箱"
+            subTitle={emailSubtitle}
+            onClick={!isLoggedIn ? () => navigate(Path.Auth) : undefined}
+          />
+          <ListItem title="付费等级" subTitle={paidLevel} />
+          <ListItem title="服务等级" subTitle={serviceLevel} />
           {PROFILE_ITEMS.map((item) => (
             <ListItem
               key={item.label}

@@ -370,7 +370,6 @@ export function SideBar(props: { className?: string }) {
                     </div>
                   }
                   shadow
-                  className={styles["sidebar-profile-button"]}
                 />
               </Link>
             </div>
