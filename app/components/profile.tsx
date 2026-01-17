@@ -5,6 +5,7 @@ import styles from "./profile.module.scss";
 import CloseIcon from "../icons/close.svg";
 
 import { IconButton } from "./button";
+import { InputRange } from "./input-range";
 import { List, ListItem, Popover, Select, showToast } from "./ui-lib";
 
 import { ErrorBoundary } from "./error";
@@ -12,11 +13,17 @@ import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import { Avatar, AvatarPicker } from "./emoji";
 import { useAppConfig, useProfileStore } from "../store";
+import { ALL_LANG_OPTIONS, AllLangs, type Lang } from "../locales";
 import { clearAuthSession, getAuthSession } from "../utils/auth-session";
+import countries from "i18n-iso-countries";
+import zhLocale from "i18n-iso-countries/langs/zh.json";
 
 const PAID_LEVELS = ["free", "pro", "premium"];
 const SERVICE_LEVELS = ["free", "standard", "enterprise"];
 const NAME_RULE = /^[\u4e00-\u9fa5A-Za-z0-9_ ]{2,16}$/;
+const REGION_LOCALE = "zh";
+
+countries.registerLocale(zhLocale);
 
 type ProfileFormState = {
   displayName: string;
@@ -33,6 +40,29 @@ function normalizeLevel(value: string, fallback: string, list: string[]) {
   if (!trimmed) return fallback;
   if (!list.includes(trimmed)) return trimmed;
   return trimmed;
+}
+
+function normalizeLanguage(value: string) {
+  const trimmed = value?.trim();
+  if (!trimmed) return "";
+  if (AllLangs.includes(trimmed as Lang)) {
+    return trimmed;
+  }
+  const match = Object.entries(ALL_LANG_OPTIONS).find(
+    ([, label]) => label === trimmed,
+  );
+  return match ? match[0] : trimmed;
+}
+
+function normalizeRegion(value: string) {
+  const trimmed = value?.trim();
+  if (!trimmed) return "";
+  const upper = trimmed.toUpperCase();
+  if (countries.getName(upper, REGION_LOCALE)) {
+    return upper;
+  }
+  const alpha2 = countries.getAlpha2Code(trimmed, REGION_LOCALE);
+  return alpha2 ?? trimmed;
 }
 
 function pickNextLevel(value: string, list: string[]) {
@@ -68,8 +98,8 @@ export function Profile() {
     displayName: profileState.displayName,
     gender: profileState.gender,
     age: profileState.age,
-    preferredLanguage: profileState.preferredLanguage,
-    region: profileState.region,
+    preferredLanguage: normalizeLanguage(profileState.preferredLanguage),
+    region: normalizeRegion(profileState.region),
     paidLevel: normalizeLevel(profileState.paidLevel, "free", PAID_LEVELS),
     serviceLevel: normalizeLevel(
       profileState.serviceLevel,
@@ -77,28 +107,31 @@ export function Profile() {
       SERVICE_LEVELS,
     ),
   });
-  const emailSubtitle = useMemo(() => {
-    if (isLoggedIn) {
-      return email;
-    }
-    return (
-      <button
-        type="button"
-        className={styles["login-link"]}
-        onClick={() => navigate(Path.Auth)}
-      >
-        登录
-      </button>
-    );
-  }, [email, isLoggedIn, navigate]);
+  const emailSubtitle = isLoggedIn ? email : "未登录";
+
+  const languageOptions = useMemo(
+    () =>
+      Object.entries(ALL_LANG_OPTIONS).map(([value, label]) => ({
+        value,
+        label,
+      })),
+    [],
+  );
+
+  const regionOptions = useMemo(() => {
+    const names = countries.getNames(REGION_LOCALE, { select: "official" });
+    return Object.entries(names)
+      .map(([code, name]) => ({ value: code, label: name }))
+      .sort((a, b) => a.label.localeCompare(b.label, "zh-Hans-CN"));
+  }, []);
 
   const syncFormFromStore = useCallback(() => {
     setFormState({
       displayName: profileState.displayName,
       gender: profileState.gender,
       age: profileState.age,
-      preferredLanguage: profileState.preferredLanguage,
-      region: profileState.region,
+      preferredLanguage: normalizeLanguage(profileState.preferredLanguage),
+      region: normalizeRegion(profileState.region),
       paidLevel: normalizeLevel(profileState.paidLevel, "free", PAID_LEVELS),
       serviceLevel: normalizeLevel(
         profileState.serviceLevel,
@@ -138,9 +171,10 @@ export function Profile() {
             "Hexagram 用户",
           gender: data.gender ?? profileSnapshot.gender,
           age: data.age?.toString() ?? profileSnapshot.age,
-          preferredLanguage:
+          preferredLanguage: normalizeLanguage(
             data.preferredLanguage ?? profileSnapshot.preferredLanguage,
-          region: data.region ?? profileSnapshot.region,
+          ),
+          region: normalizeRegion(data.region ?? profileSnapshot.region),
           paidLevel: normalizeLevel(
             data.paidLevel ?? profileSnapshot.paidLevel,
             "free",
@@ -189,9 +223,23 @@ export function Profile() {
     !NAME_RULE.test(formState.displayName.trim());
   const ageValue = formState.age.trim();
   const ageNumber = Number(ageValue);
+  const ageNumberValid = ageValue.length > 0 && !Number.isNaN(ageNumber);
   const ageInvalid =
     ageValue.length > 0 &&
     (Number.isNaN(ageNumber) || ageNumber < 1 || ageNumber > 120);
+  const ageSliderValue = ageNumberValid ? ageNumber : 18;
+  const ageLabel = ageNumberValid ? `${ageNumber} 岁` : "未设置";
+
+  const updateField = useCallback(
+    (key: keyof ProfileFormState) =>
+      (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setFormState((prev) => ({
+          ...prev,
+          [key]: event.target?.value ?? "",
+        }));
+      },
+    [],
+  );
 
   const handleLogout = useCallback(() => {
     clearAuthSession();
@@ -320,23 +368,15 @@ export function Profile() {
               <input
                 type="text"
                 value={formState.displayName}
-                onInput={(event) =>
-                  setFormState((prev) => ({
-                    ...prev,
-                    displayName: event.currentTarget.value,
-                  }))
-                }
+                onChange={updateField("displayName")}
                 placeholder="请输入用户名"
                 className={styles["profile-input"]}
               />
-              <div
-                className={styles["profile-hint"]}
-                data-error={displayNameError}
-              >
-                {displayNameError
-                  ? "用户名格式不符合规则"
-                  : "默认用户名为 Hexagram 用户"}
-              </div>
+              {displayNameError ? (
+                <div className={styles["profile-hint"]} data-error="true">
+                  用户名需为 2-16 位中文/字母/数字/下划线/空格
+                </div>
+              ) : null}
             </div>
           </ListItem>
           <ListItem title="头像">
@@ -364,11 +404,7 @@ export function Profile() {
               </div>
             </Popover>
           </ListItem>
-          <ListItem
-            title="注册邮箱"
-            subTitle={emailSubtitle}
-            onClick={!isLoggedIn ? () => navigate(Path.Auth) : undefined}
-          >
+          <ListItem title="注册邮箱" subTitle={emailSubtitle}>
             {isLoggedIn ? (
               <IconButton
                 aria="注销账号"
@@ -376,7 +412,16 @@ export function Profile() {
                 type="danger"
                 onClick={handleLogout}
               />
-            ) : undefined}
+            ) : (
+              <div className={styles["profile-actions"]}>
+                <IconButton
+                  aria="登录"
+                  text="登录"
+                  type="primary"
+                  onClick={() => navigate(Path.Auth)}
+                />
+              </div>
+            )}
           </ListItem>
           <ListItem title="付费等级" subTitle={formState.paidLevel}>
             <div className={styles["profile-actions"]}>
@@ -416,13 +461,7 @@ export function Profile() {
             <div className={styles["profile-control"]}>
               <Select
                 value={formState.gender}
-                align="left"
-                onChange={(event) =>
-                  setFormState((prev) => ({
-                    ...prev,
-                    gender: event.target.value,
-                  }))
-                }
+                onChange={updateField("gender")}
                 className={styles["profile-select"]}
               >
                 <option value="">未设置</option>
@@ -435,52 +474,48 @@ export function Profile() {
           </ListItem>
           <ListItem title="年龄" subTitle={ageInvalid ? "请输入 1-120" : ""}>
             <div className={styles["profile-control"]}>
-              <input
-                type="number"
-                min={1}
-                max={120}
-                value={formState.age}
-                onInput={(event) =>
-                  setFormState((prev) => ({
-                    ...prev,
-                    age: event.currentTarget.value,
-                  }))
-                }
-                placeholder="未设置"
-                className={styles["profile-input"]}
+              <InputRange
+                aria="年龄"
+                min="1"
+                max="120"
+                step="1"
+                value={ageSliderValue}
+                title={ageLabel}
+                className={styles["profile-range"]}
+                onChange={updateField("age")}
               />
             </div>
           </ListItem>
           <ListItem title="偏好语言">
             <div className={styles["profile-control"]}>
-              <input
-                type="text"
+              <Select
                 value={formState.preferredLanguage}
-                onInput={(event) =>
-                  setFormState((prev) => ({
-                    ...prev,
-                    preferredLanguage: event.currentTarget.value,
-                  }))
-                }
-                placeholder="例如：中文"
-                className={styles["profile-input"]}
-              />
+                onChange={updateField("preferredLanguage")}
+                className={styles["profile-select"]}
+              >
+                <option value="">未设置</option>
+                {languageOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
             </div>
           </ListItem>
           <ListItem title="地区">
             <div className={styles["profile-control"]}>
-              <input
-                type="text"
+              <Select
                 value={formState.region}
-                onInput={(event) =>
-                  setFormState((prev) => ({
-                    ...prev,
-                    region: event.currentTarget.value,
-                  }))
-                }
-                placeholder="例如：中国"
-                className={styles["profile-input"]}
-              />
+                onChange={updateField("region")}
+                className={styles["profile-select"]}
+              >
+                <option value="">未设置</option>
+                {regionOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
             </div>
           </ListItem>
           <ListItem
