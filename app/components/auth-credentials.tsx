@@ -43,6 +43,18 @@ export function AuthCredentialsPage() {
     setIsSubmitting(true);
 
     try {
+      const payload =
+        mode === "login"
+          ? {
+              email: email.trim(),
+              password,
+              remember,
+            }
+          : {
+              email: email.trim(),
+              password,
+            };
+
       const response = await fetch(
         mode === "login" ? ApiPath.AuthLogin : ApiPath.AuthRegister,
         {
@@ -50,11 +62,7 @@ export function AuthCredentialsPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            email: email.trim(),
-            password,
-            remember,
-          }),
+          body: JSON.stringify(payload),
         },
       );
 
