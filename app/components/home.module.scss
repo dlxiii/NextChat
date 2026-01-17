@@ -335,20 +335,14 @@
   margin-right: 15px;
 }
 
-.sidebar-profile-button {
-  padding: 6px;
-  border-radius: 999px;
-}
-
 .sidebar-profile-avatar {
-  width: 32px;
-  height: 32px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--second);
-  border: var(--border-in-light);
+  overflow: hidden;
 
   :global(.user-avatar) {
     width: 100%;
@@ -356,7 +350,7 @@
     min-width: 100%;
     min-height: 100%;
     border-radius: 50%;
-    border: none;
+    border: 0;
     box-shadow: none;
     background: transparent;
   }

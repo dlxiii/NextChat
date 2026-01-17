@@ -50,3 +50,12 @@
   position: relative;
   z-index: 1;
 }
+
+.login-link {
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+}
