@@ -55,9 +55,10 @@ export function AuthCredentialsPage() {
               password,
             };
 
-      const endpoint =
-        mode === "login" ? ApiPath.AuthLogin : ApiPath.AuthRegister;
-      const response = await fetch(String(endpoint), {
+      const endpoint = `${
+        mode === "login" ? ApiPath.AuthLogin : ApiPath.AuthRegister
+      }`;
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
