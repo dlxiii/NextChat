@@ -51,47 +51,8 @@
   z-index: 1;
 }
 
-.profile-control {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 8px;
-  flex: 0 1 50%;
-  max-width: 50%;
-}
-
-.profile-control-right {
-  align-items: flex-end;
-}
-
-.profile-control-right .profile-select,
-.profile-control-right .profile-range {
-  width: 100%;
-  max-width: 100%;
-}
-
-.profile-select {
-  width: 100%;
-
-  :global(.select-with-icon-select) {
-    width: 100%;
-    text-align: left;
-  }
-}
-
-
 .profile-actions {
   display: flex;
   justify-content: flex-end;
   margin-top: 8px;
-}
-
-.profile-range {
-  width: 100%;
-  max-width: 100%;
-  text-align: left;
-
-  input[type="range"] {
-    max-width: calc(100% - 70px);
-  }
 }
