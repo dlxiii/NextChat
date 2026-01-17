@@ -51,15 +51,6 @@
   z-index: 1;
 }
 
-.login-link {
-  background: transparent;
-  border: none;
-  color: var(--primary);
-  cursor: pointer;
-  padding: 0;
-  font: inherit;
-}
-
 .profile-control {
   display: flex;
   flex-direction: column;
@@ -76,10 +67,16 @@
   background: var(--second);
   color: inherit;
   font: inherit;
+  text-align: right;
 }
 
 .profile-select {
   width: 100%;
+
+  :global(.select-with-icon-select) {
+    width: 100%;
+    text-align: right;
+  }
 }
 
 .profile-hint {
@@ -96,4 +93,14 @@
   display: flex;
   justify-content: flex-end;
   margin-top: 8px;
+}
+
+.profile-range {
+  width: 100%;
+  max-width: 100%;
+  text-align: right;
+
+  input[type="range"] {
+    max-width: calc(100% - 70px);
+  }
 }
