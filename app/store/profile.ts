@@ -12,8 +12,21 @@ export type UserProfile = {
   lastSyncedAt?: number;
 };
 
-export const DEFAULT_PROFILE: UserProfile = {
-  displayName: "Hexagram 用户",
+const DEFAULT_NAME_CHARS =
+  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+const DEFAULT_NAME_LENGTH = 8;
+
+const generateDefaultDisplayName = () => {
+  let suffix = "";
+  for (let i = 0; i < DEFAULT_NAME_LENGTH; i += 1) {
+    suffix +=
+      DEFAULT_NAME_CHARS[Math.floor(Math.random() * DEFAULT_NAME_CHARS.length)];
+  }
+  return `user_${suffix}`;
+};
+
+export const createDefaultProfile = (): UserProfile => ({
+  displayName: generateDefaultDisplayName(),
   gender: "",
   age: "",
   preferredLanguage: "cn",
@@ -21,7 +34,9 @@ export const DEFAULT_PROFILE: UserProfile = {
   paidLevel: "free",
   serviceLevel: "free",
   lastSyncedAt: undefined,
-};
+});
+
+export const DEFAULT_PROFILE: UserProfile = createDefaultProfile();
 
 export const useProfileStore = createPersistStore(
   { ...DEFAULT_PROFILE },
@@ -34,7 +49,7 @@ export const useProfileStore = createPersistStore(
       });
     },
     resetProfile() {
-      set(() => ({ ...DEFAULT_PROFILE }));
+      set(() => ({ ...createDefaultProfile() }));
     },
   }),
   {
