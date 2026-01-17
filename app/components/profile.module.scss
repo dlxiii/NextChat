@@ -59,3 +59,41 @@
   padding: 0;
   font: inherit;
 }
+
+.profile-control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.profile-input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: var(--border-in-light);
+  background: var(--second);
+  color: inherit;
+  font: inherit;
+}
+
+.profile-select {
+  width: 100%;
+}
+
+.profile-hint {
+  font-size: 12px;
+  opacity: 0.7;
+
+  &[data-error="true"] {
+    color: var(--danger);
+    opacity: 1;
+  }
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
