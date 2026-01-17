@@ -5,7 +5,6 @@ import styles from "./profile.module.scss";
 import CloseIcon from "../icons/close.svg";
 
 import { IconButton } from "./button";
-import { InputRange } from "./input-range";
 import { List, ListItem, Popover, Select, showToast } from "./ui-lib";
 
 import { ErrorBoundary } from "./error";
@@ -15,21 +14,12 @@ import { Avatar, AvatarPicker } from "./emoji";
 import { DEFAULT_PROFILE, useAppConfig, useProfileStore } from "../store";
 import Locale, { ALL_LANG_OPTIONS, AllLangs, type Lang } from "../locales";
 import { clearAuthSession, getAuthSession } from "../utils/auth-session";
-import countries from "i18n-iso-countries";
-import zhLocale from "i18n-iso-countries/langs/zh.json";
 
 const PAID_LEVELS = ["free", "pro", "premium"];
 const SERVICE_LEVELS = ["free", "standard", "enterprise"];
-const REGION_LOCALE = "zh";
-
-countries.registerLocale(zhLocale);
-
 type ProfileFormState = {
   displayName: string;
-  gender: string;
-  age: string;
   preferredLanguage: string;
-  region: string;
   paidLevel: string;
   serviceLevel: string;
 };
@@ -53,17 +43,6 @@ function normalizeLanguage(value: string) {
   return match ? match[0] : trimmed;
 }
 
-function normalizeRegion(value: string) {
-  const trimmed = value?.trim();
-  if (!trimmed) return "";
-  const upper = trimmed.toUpperCase();
-  if (countries.getName(upper, REGION_LOCALE)) {
-    return upper;
-  }
-  const alpha2 = countries.getAlpha2Code(trimmed, REGION_LOCALE);
-  return alpha2 ?? trimmed;
-}
-
 function pickNextLevel(value: string, list: string[]) {
   const index = list.indexOf(value);
   if (index === -1) return list[0];
@@ -81,10 +60,7 @@ export function Profile() {
   const config = useAppConfig();
   const profileState = useProfileStore((state) => ({
     displayName: state.displayName,
-    gender: state.gender,
-    age: state.age,
     preferredLanguage: state.preferredLanguage,
-    region: state.region,
     paidLevel: state.paidLevel,
     serviceLevel: state.serviceLevel,
   }));
@@ -95,10 +71,7 @@ export function Profile() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [formState, setFormState] = useState<ProfileFormState>({
     displayName: profileState.displayName,
-    gender: profileState.gender,
-    age: profileState.age,
     preferredLanguage: normalizeLanguage(profileState.preferredLanguage),
-    region: normalizeRegion(profileState.region),
     paidLevel: normalizeLevel(profileState.paidLevel, "free", PAID_LEVELS),
     serviceLevel: normalizeLevel(
       profileState.serviceLevel,
@@ -117,20 +90,10 @@ export function Profile() {
     [],
   );
 
-  const regionOptions = useMemo(() => {
-    const names = countries.getNames(REGION_LOCALE, { select: "official" });
-    return Object.entries(names)
-      .map(([code, name]) => ({ value: code, label: name }))
-      .sort((a, b) => a.label.localeCompare(b.label, "zh-Hans-CN"));
-  }, []);
-
   const syncFormFromStore = useCallback(() => {
     setFormState({
       displayName: profileState.displayName,
-      gender: profileState.gender,
-      age: profileState.age,
       preferredLanguage: normalizeLanguage(profileState.preferredLanguage),
-      region: normalizeRegion(profileState.region),
       paidLevel: normalizeLevel(profileState.paidLevel, "free", PAID_LEVELS),
       serviceLevel: normalizeLevel(
         profileState.serviceLevel,
@@ -168,12 +131,9 @@ export function Profile() {
             data.displayName?.trim() ||
             profileSnapshot.displayName ||
             DEFAULT_PROFILE.displayName,
-          gender: data.gender ?? profileSnapshot.gender,
-          age: data.age?.toString() ?? profileSnapshot.age,
           preferredLanguage: normalizeLanguage(
             data.preferredLanguage ?? profileSnapshot.preferredLanguage,
           ),
-          region: normalizeRegion(data.region ?? profileSnapshot.region),
           paidLevel: normalizeLevel(
             data.paidLevel ?? profileSnapshot.paidLevel,
             "free",
@@ -187,10 +147,7 @@ export function Profile() {
         };
         updateProfile((profile) => {
           profile.displayName = normalized.displayName;
-          profile.gender = normalized.gender;
-          profile.age = normalized.age;
           profile.preferredLanguage = normalized.preferredLanguage;
-          profile.region = normalized.region;
           profile.paidLevel = normalized.paidLevel;
           profile.serviceLevel = normalized.serviceLevel;
           profile.lastSyncedAt = Date.now();
@@ -217,17 +174,6 @@ export function Profile() {
     updateProfile,
   ]);
 
-  const ageValue = formState.age.trim();
-  const ageNumber = Number(ageValue);
-  const ageNumberValid = ageValue.length > 0 && !Number.isNaN(ageNumber);
-  const ageInvalid =
-    ageValue.length > 0 &&
-    (Number.isNaN(ageNumber) || ageNumber < 1 || ageNumber > 120);
-  const ageSliderValue = ageNumberValid ? ageNumber : 18;
-  const ageLabel = ageNumberValid
-    ? Locale.Profile.Age.Label(ageNumber)
-    : Locale.Profile.Age.NotSet;
-
   const updateField = useCallback(
     (key: keyof ProfileFormState) =>
       (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -246,27 +192,16 @@ export function Profile() {
   }, []);
 
   const handleSave = useCallback(async () => {
-    if (ageInvalid) {
-      showToast(Locale.Profile.Toasts.AgeInvalid);
-      return;
-    }
-
     const payload = {
       displayName: formState.displayName.trim() || DEFAULT_PROFILE.displayName,
-      gender: formState.gender,
-      age: formState.age.trim(),
       preferredLanguage: formState.preferredLanguage.trim(),
-      region: formState.region.trim(),
       paidLevel: formState.paidLevel,
       serviceLevel: formState.serviceLevel,
     };
 
     updateProfile((profile) => {
       profile.displayName = payload.displayName;
-      profile.gender = payload.gender;
-      profile.age = payload.age;
       profile.preferredLanguage = payload.preferredLanguage;
-      profile.region = payload.region;
       profile.paidLevel = payload.paidLevel;
       profile.serviceLevel = payload.serviceLevel;
     });
@@ -301,7 +236,6 @@ export function Profile() {
       setIsSyncing(false);
     }
   }, [
-    ageInvalid,
     authSession?.accessToken,
     authSession?.tokenType,
     formState,
@@ -446,53 +380,6 @@ export function Profile() {
               />
             </div>
           </ListItem>
-          <ListItem
-            title={Locale.Profile.Gender.Title}
-            subTitle={isLoggedIn ? "" : Locale.Profile.Gender.SubTitle}
-          >
-            <div
-              className={`${styles["profile-control"]} ${styles["profile-control-right"]}`}
-            >
-              <Select
-                value={formState.gender}
-                onChange={updateField("gender")}
-                className={styles["profile-select"]}
-              >
-                <option value="">{Locale.Profile.NotSet}</option>
-                <option value="male">
-                  {Locale.Profile.Gender.Options.Male}
-                </option>
-                <option value="female">
-                  {Locale.Profile.Gender.Options.Female}
-                </option>
-                <option value="nonbinary">
-                  {Locale.Profile.Gender.Options.NonBinary}
-                </option>
-                <option value="private">
-                  {Locale.Profile.Gender.Options.Private}
-                </option>
-              </Select>
-            </div>
-          </ListItem>
-          <ListItem
-            title={Locale.Profile.Age.Title}
-            subTitle={ageInvalid ? Locale.Profile.Age.Error : ""}
-          >
-            <div
-              className={`${styles["profile-control"]} ${styles["profile-control-right"]}`}
-            >
-              <InputRange
-                aria={Locale.Profile.Age.Title}
-                min="1"
-                max="120"
-                step="1"
-                value={ageSliderValue}
-                title={ageLabel}
-                className={styles["profile-range"]}
-                onChange={updateField("age")}
-              />
-            </div>
-          </ListItem>
           <ListItem title={Locale.Profile.PreferredLanguage}>
             <div
               className={`${styles["profile-control"]} ${styles["profile-control-right"]}`}
@@ -504,24 +391,6 @@ export function Profile() {
               >
                 <option value="">{Locale.Profile.NotSet}</option>
                 {languageOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
-            </div>
-          </ListItem>
-          <ListItem title={Locale.Profile.Region}>
-            <div
-              className={`${styles["profile-control"]} ${styles["profile-control-right"]}`}
-            >
-              <Select
-                value={formState.region}
-                onChange={updateField("region")}
-                className={styles["profile-select"]}
-              >
-                <option value="">{Locale.Profile.NotSet}</option>
-                {regionOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
