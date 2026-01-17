@@ -3,10 +3,7 @@ import { createPersistStore } from "../utils/store";
 
 export type UserProfile = {
   displayName: string;
-  gender: string;
-  age: string;
   preferredLanguage: string;
-  region: string;
   paidLevel: string;
   serviceLevel: string;
   lastSyncedAt?: number;
@@ -27,10 +24,7 @@ const generateDefaultDisplayName = () => {
 
 export const createDefaultProfile = (): UserProfile => ({
   displayName: generateDefaultDisplayName(),
-  gender: "",
-  age: "",
   preferredLanguage: "cn",
-  region: "CN",
   paidLevel: "free",
   serviceLevel: "free",
   lastSyncedAt: undefined,
