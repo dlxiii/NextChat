@@ -59,6 +59,17 @@
   margin-top: 8px;
 }
 
+.profile-control-right {
+  align-items: flex-end;
+}
+
+.profile-control-right .profile-input,
+.profile-control-right .profile-select,
+.profile-control-right .profile-range {
+  width: 100%;
+  max-width: 320px;
+}
+
 .profile-input {
   width: 100%;
   padding: 8px 10px;
