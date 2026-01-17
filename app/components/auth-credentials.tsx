@@ -1,22 +1,30 @@
 import styles from "./auth-credentials.module.scss";
 import { IconButton } from "./button";
 import { showToast } from "./ui-lib";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ApiPath, Path } from "../constant";
 import Locale from "../locales";
 import LeftIcon from "../icons/left.svg";
 import { PasswordInput } from "./ui-lib";
 import clsx from "clsx";
+import { getAuthSession, persistAuthSession } from "../utils/auth-session";
 
 export function AuthCredentialsPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [remember, setRemember] = useState(true);
+  const [remember, setRemember] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mode, setMode] = useState<"login" | "register">("login");
+
+  useEffect(() => {
+    const session = getAuthSession();
+    if (session?.accessToken) {
+      navigate(Path.Chat);
+    }
+  }, [navigate]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -67,8 +75,32 @@ export function AuthCredentialsPage() {
         body: JSON.stringify(payload),
       });
 
+      const responseText = await response.text();
+      let responseJson: Record<string, unknown> | null = null;
+      if (responseText) {
+        try {
+          responseJson = JSON.parse(responseText);
+        } catch (error) {
+          console.warn("[Auth] Failed to parse auth response", error);
+        }
+      }
+
       if (!response.ok) {
-        throw new Error(await response.text());
+        throw new Error(responseText);
+      }
+
+      if (mode === "login" && responseJson?.access_token) {
+        persistAuthSession(
+          {
+            accessToken: responseJson.access_token as string,
+            tokenType: responseJson.token_type as string | undefined,
+            email: responseJson.email as string | undefined,
+            userId: responseJson.userId as string | undefined,
+            roles: responseJson.roles as string[] | undefined,
+            plan: responseJson.plan as string | undefined,
+          },
+          remember,
+        );
       }
 
       showToast(

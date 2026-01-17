@@ -4,7 +4,7 @@ import { HEXAGRAM_BASE_URL } from "@/app/constant";
 const AUTH_BASE_URL = HEXAGRAM_BASE_URL.replace(/\/$/, "");
 
 async function proxyAuth(req: NextRequest, action: "login" | "register") {
-  const response = await fetch(`${AUTH_BASE_URL}/auth/${action}`, {
+  const response = await fetch(`${AUTH_BASE_URL}/api/auth/${action}`, {
     method: req.method,
     headers: {
       "Content-Type": req.headers.get("Content-Type") ?? "application/json",
