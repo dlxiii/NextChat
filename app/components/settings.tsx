@@ -41,6 +41,7 @@ import {
   useUpdateStore,
   useAccessStore,
   useAppConfig,
+  useProfileStore,
 } from "../store";
 
 import Locale, {
@@ -48,6 +49,7 @@ import Locale, {
   ALL_LANG_OPTIONS,
   changeLang,
   getLang,
+  type Lang,
 } from "../locales";
 import { copyToClipboard, clientUpdate, semverCompare } from "../utils";
 import Link from "next/link";
@@ -586,6 +588,7 @@ export function Settings() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const config = useAppConfig();
   const updateConfig = config.update;
+  const updateProfile = useProfileStore((state) => state.updateProfile);
 
   const updateStore = useUpdateStore();
   const [checkingUpdate, setCheckingUpdate] = useState(false);
@@ -1459,44 +1462,44 @@ export function Settings() {
     </>
   );
 
-  const ai302ConfigComponent = accessStore.provider === ServiceProvider["302.AI"] && (
+  const ai302ConfigComponent = accessStore.provider ===
+    ServiceProvider["302.AI"] && (
     <>
       <ListItem
-          title={Locale.Settings.Access.AI302.Endpoint.Title}
-          subTitle={
-            Locale.Settings.Access.AI302.Endpoint.SubTitle +
-            AI302.ExampleEndpoint
+        title={Locale.Settings.Access.AI302.Endpoint.Title}
+        subTitle={
+          Locale.Settings.Access.AI302.Endpoint.SubTitle + AI302.ExampleEndpoint
+        }
+      >
+        <input
+          aria-label={Locale.Settings.Access.AI302.Endpoint.Title}
+          type="text"
+          value={accessStore.ai302Url}
+          placeholder={AI302.ExampleEndpoint}
+          onChange={(e) =>
+            accessStore.update(
+              (access) => (access.ai302Url = e.currentTarget.value),
+            )
           }
-        >
-          <input
-            aria-label={Locale.Settings.Access.AI302.Endpoint.Title}
-            type="text"
-            value={accessStore.ai302Url}
-            placeholder={AI302.ExampleEndpoint}
-            onChange={(e) =>
-              accessStore.update(
-                (access) => (access.ai302Url = e.currentTarget.value),
-              )
-            }
-          ></input>
-        </ListItem>
-        <ListItem
-          title={Locale.Settings.Access.AI302.ApiKey.Title}
-          subTitle={Locale.Settings.Access.AI302.ApiKey.SubTitle}
-        >
-          <PasswordInput
-            aria-label={Locale.Settings.Access.AI302.ApiKey.Title}
-            value={accessStore.ai302ApiKey}
-            type="text"
-            placeholder={Locale.Settings.Access.AI302.ApiKey.Placeholder}
-            onChange={(e) => {
-              accessStore.update(
-                (access) => (access.ai302ApiKey = e.currentTarget.value),
-              );
-            }}
-          />
-        </ListItem>
-      </>
+        ></input>
+      </ListItem>
+      <ListItem
+        title={Locale.Settings.Access.AI302.ApiKey.Title}
+        subTitle={Locale.Settings.Access.AI302.ApiKey.SubTitle}
+      >
+        <PasswordInput
+          aria-label={Locale.Settings.Access.AI302.ApiKey.Title}
+          value={accessStore.ai302ApiKey}
+          type="text"
+          placeholder={Locale.Settings.Access.AI302.ApiKey.Placeholder}
+          onChange={(e) => {
+            accessStore.update(
+              (access) => (access.ai302ApiKey = e.currentTarget.value),
+            );
+          }}
+        />
+      </ListItem>
+    </>
   );
 
   return (
@@ -1626,7 +1629,11 @@ export function Settings() {
               aria-label={Locale.Settings.Lang.Name}
               value={getLang()}
               onChange={(e) => {
-                changeLang(e.target.value as any);
+                const nextLang = e.target.value as Lang;
+                updateProfile((profile) => {
+                  profile.preferredLanguage = nextLang;
+                });
+                changeLang(nextLang);
               }}
             >
               {AllLangs.map((lang) => (

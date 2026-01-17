@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import { Avatar, AvatarPicker } from "./emoji";
 import { useAppConfig, useProfileStore } from "../store";
-import { ALL_LANG_OPTIONS, AllLangs, type Lang } from "../locales";
+import Locale, { ALL_LANG_OPTIONS, AllLangs, type Lang } from "../locales";
 import { clearAuthSession, getAuthSession } from "../utils/auth-session";
 import countries from "i18n-iso-countries";
 import zhLocale from "i18n-iso-countries/langs/zh.json";
@@ -92,7 +92,7 @@ export function Profile() {
   const updateProfile = useProfileStore((state) => state.updateProfile);
   const [authSession, setAuthSession] = useState(() => getAuthSession());
   const isLoggedIn = Boolean(authSession?.accessToken);
-  const email = authSession?.email?.trim() || "未登录";
+  const email = authSession?.email?.trim() || Locale.Profile.EmailNotLoggedIn;
   const [isSyncing, setIsSyncing] = useState(false);
   const [formState, setFormState] = useState<ProfileFormState>({
     displayName: profileState.displayName,
@@ -107,7 +107,7 @@ export function Profile() {
       SERVICE_LEVELS,
     ),
   });
-  const emailSubtitle = isLoggedIn ? email : "未登录";
+  const emailSubtitle = isLoggedIn ? email : Locale.Profile.EmailNotLoggedIn;
 
   const languageOptions = useMemo(
     () =>
@@ -168,7 +168,7 @@ export function Profile() {
           displayName:
             data.displayName?.trim() ||
             profileSnapshot.displayName ||
-            "Hexagram 用户",
+            Locale.Profile.DefaultName,
           gender: data.gender ?? profileSnapshot.gender,
           age: data.age?.toString() ?? profileSnapshot.age,
           preferredLanguage: normalizeLanguage(
@@ -199,7 +199,7 @@ export function Profile() {
         setFormState(normalized);
       } catch (error) {
         if (!canceled) {
-          showToast("读取后端资料失败，已使用本地缓存");
+          showToast(Locale.Profile.Toasts.LoadFailed);
         }
       } finally {
         if (!canceled) {
@@ -228,7 +228,9 @@ export function Profile() {
     ageValue.length > 0 &&
     (Number.isNaN(ageNumber) || ageNumber < 1 || ageNumber > 120);
   const ageSliderValue = ageNumberValid ? ageNumber : 18;
-  const ageLabel = ageNumberValid ? `${ageNumber} 岁` : "未设置";
+  const ageLabel = ageNumberValid
+    ? Locale.Profile.Age.Label(ageNumber)
+    : Locale.Profile.Age.NotSet;
 
   const updateField = useCallback(
     (key: keyof ProfileFormState) =>
@@ -244,21 +246,21 @@ export function Profile() {
   const handleLogout = useCallback(() => {
     clearAuthSession();
     setAuthSession(null);
-    showToast("已注销登录");
+    showToast(Locale.Profile.Toasts.Logout);
   }, []);
 
   const handleSave = useCallback(async () => {
     if (displayNameError) {
-      showToast("用户名需为 2-16 位中文/字母/数字/下划线/空格");
+      showToast(Locale.Profile.Toasts.NameInvalid);
       return;
     }
     if (ageInvalid) {
-      showToast("年龄需为 1-120 的数字");
+      showToast(Locale.Profile.Toasts.AgeInvalid);
       return;
     }
 
     const payload = {
-      displayName: formState.displayName.trim() || "Hexagram 用户",
+      displayName: formState.displayName.trim() || Locale.Profile.DefaultName,
       gender: formState.gender,
       age: formState.age.trim(),
       preferredLanguage: formState.preferredLanguage.trim(),
@@ -278,7 +280,7 @@ export function Profile() {
     });
 
     if (!isLoggedIn || !authSession?.accessToken) {
-      showToast("已保存到本地缓存，登录后才会同步，清理缓存将丢失");
+      showToast(Locale.Profile.Toasts.SavedLocal);
       return;
     }
 
@@ -300,9 +302,9 @@ export function Profile() {
       updateProfile((profile) => {
         profile.lastSyncedAt = Date.now();
       });
-      showToast("设置已同步到后端");
+      showToast(Locale.Profile.Toasts.Synced);
     } catch (error) {
-      showToast("同步失败，已保存在本地缓存");
+      showToast(Locale.Profile.Toasts.SyncFailed);
     } finally {
       setIsSyncing(false);
     }
@@ -328,9 +330,9 @@ export function Profile() {
     <ErrorBoundary>
       <div className="window-header" data-tauri-drag-region>
         <div className="window-header-title">
-          <div className="window-header-main-title">用户资料</div>
+          <div className="window-header-main-title">{Locale.Profile.Title}</div>
           <div className="window-header-sub-title">
-            管理你的个人信息与偏好设置
+            {Locale.Profile.SubTitle}
           </div>
         </div>
         <div className="window-actions">
@@ -338,7 +340,7 @@ export function Profile() {
           <div className="window-action-button"></div>
           <div className="window-action-button">
             <IconButton
-              aria="关闭"
+              aria={Locale.UI.Close}
               icon={<CloseIcon />}
               onClick={() => navigate(Path.Home)}
               bordered
@@ -353,33 +355,38 @@ export function Profile() {
           </div>
           <div>
             <div className={styles["profile-name"]}>
-              {formState.displayName || "Hexagram 用户"}
+              {formState.displayName || Locale.Profile.DefaultName}
             </div>
             <div className={styles["profile-subtitle"]}>
               {isLoggedIn
-                ? "欢迎回来，完善资料以解锁更多服务"
-                : "登录后可同步至云端"}
+                ? Locale.Profile.SubtitleLoggedIn
+                : Locale.Profile.SubtitleLoggedOut}
             </div>
           </div>
         </div>
         <List>
-          <ListItem title="用户名" subTitle="2-16 位中文/字母/数字/下划线/空格">
-            <div className={styles["profile-control"]}>
+          <ListItem
+            title={Locale.Profile.Username.Title}
+            subTitle={Locale.Profile.Username.SubTitle}
+          >
+            <div
+              className={`${styles["profile-control"]} ${styles["profile-control-right"]}`}
+            >
               <input
                 type="text"
                 value={formState.displayName}
                 onChange={updateField("displayName")}
-                placeholder="请输入用户名"
+                placeholder={Locale.Profile.Username.Placeholder}
                 className={styles["profile-input"]}
               />
               {displayNameError ? (
                 <div className={styles["profile-hint"]} data-error="true">
-                  用户名需为 2-16 位中文/字母/数字/下划线/空格
+                  {Locale.Profile.Username.Error}
                 </div>
               ) : null}
             </div>
           </ListItem>
-          <ListItem title="头像">
+          <ListItem title={Locale.Profile.Avatar}>
             <Popover
               onClose={() => setShowAvatarPicker(false)}
               content={
@@ -393,7 +400,7 @@ export function Profile() {
               open={showAvatarPicker}
             >
               <div
-                aria-label="用户头像"
+                aria-label={Locale.Profile.AvatarLabel}
                 tabIndex={0}
                 className={styles.avatar}
                 onClick={() => {
@@ -404,30 +411,37 @@ export function Profile() {
               </div>
             </Popover>
           </ListItem>
-          <ListItem title="注册邮箱" subTitle={emailSubtitle}>
+          <ListItem title={Locale.Profile.Email} subTitle={emailSubtitle}>
             {isLoggedIn ? (
               <IconButton
-                aria="注销账号"
-                text="注销"
+                aria={Locale.Profile.Logout}
+                text={Locale.Profile.Logout}
                 type="danger"
                 onClick={handleLogout}
               />
             ) : (
               <div className={styles["profile-actions"]}>
                 <IconButton
-                  aria="登录"
-                  text="登录"
+                  aria={Locale.Profile.Login}
+                  text={Locale.Profile.Login}
                   type="primary"
                   onClick={() => navigate(Path.Auth)}
                 />
               </div>
             )}
           </ListItem>
-          <ListItem title="付费等级" subTitle={formState.paidLevel}>
+          <ListItem
+            title={Locale.Profile.PaidLevel}
+            subTitle={formState.paidLevel}
+          >
             <div className={styles["profile-actions"]}>
               <IconButton
-                aria="升级付费等级"
-                text={paidAtMax ? "已是最高等级" : `升级到 ${nextPaidLevel}`}
+                aria={Locale.Profile.PaidLevel}
+                text={
+                  paidAtMax
+                    ? Locale.Profile.MaxLevel
+                    : Locale.Profile.UpgradeTo(nextPaidLevel)
+                }
                 type="primary"
                 disabled={paidAtMax}
                 onClick={() =>
@@ -439,12 +453,17 @@ export function Profile() {
               />
             </div>
           </ListItem>
-          <ListItem title="服务等级" subTitle={formState.serviceLevel}>
+          <ListItem
+            title={Locale.Profile.ServiceLevel}
+            subTitle={formState.serviceLevel}
+          >
             <div className={styles["profile-actions"]}>
               <IconButton
-                aria="升级服务等级"
+                aria={Locale.Profile.ServiceLevel}
                 text={
-                  serviceAtMax ? "已是最高等级" : `升级到 ${nextServiceLevel}`
+                  serviceAtMax
+                    ? Locale.Profile.MaxLevel
+                    : Locale.Profile.UpgradeTo(nextServiceLevel)
                 }
                 type="primary"
                 disabled={serviceAtMax}
@@ -457,25 +476,43 @@ export function Profile() {
               />
             </div>
           </ListItem>
-          <ListItem title="性别" subTitle={isLoggedIn ? "" : "未登录也可编辑"}>
-            <div className={styles["profile-control"]}>
+          <ListItem
+            title={Locale.Profile.Gender.Title}
+            subTitle={isLoggedIn ? "" : Locale.Profile.Gender.SubTitle}
+          >
+            <div
+              className={`${styles["profile-control"]} ${styles["profile-control-right"]}`}
+            >
               <Select
                 value={formState.gender}
                 onChange={updateField("gender")}
                 className={styles["profile-select"]}
               >
-                <option value="">未设置</option>
-                <option value="male">男</option>
-                <option value="female">女</option>
-                <option value="nonbinary">非二元</option>
-                <option value="private">不透露</option>
+                <option value="">{Locale.Profile.NotSet}</option>
+                <option value="male">
+                  {Locale.Profile.Gender.Options.Male}
+                </option>
+                <option value="female">
+                  {Locale.Profile.Gender.Options.Female}
+                </option>
+                <option value="nonbinary">
+                  {Locale.Profile.Gender.Options.NonBinary}
+                </option>
+                <option value="private">
+                  {Locale.Profile.Gender.Options.Private}
+                </option>
               </Select>
             </div>
           </ListItem>
-          <ListItem title="年龄" subTitle={ageInvalid ? "请输入 1-120" : ""}>
-            <div className={styles["profile-control"]}>
+          <ListItem
+            title={Locale.Profile.Age.Title}
+            subTitle={ageInvalid ? Locale.Profile.Age.Error : ""}
+          >
+            <div
+              className={`${styles["profile-control"]} ${styles["profile-control-right"]}`}
+            >
               <InputRange
-                aria="年龄"
+                aria={Locale.Profile.Age.Title}
                 min="1"
                 max="120"
                 step="1"
@@ -486,14 +523,16 @@ export function Profile() {
               />
             </div>
           </ListItem>
-          <ListItem title="偏好语言">
-            <div className={styles["profile-control"]}>
+          <ListItem title={Locale.Profile.PreferredLanguage}>
+            <div
+              className={`${styles["profile-control"]} ${styles["profile-control-right"]}`}
+            >
               <Select
                 value={formState.preferredLanguage}
                 onChange={updateField("preferredLanguage")}
                 className={styles["profile-select"]}
               >
-                <option value="">未设置</option>
+                <option value="">{Locale.Profile.NotSet}</option>
                 {languageOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -502,14 +541,16 @@ export function Profile() {
               </Select>
             </div>
           </ListItem>
-          <ListItem title="地区">
-            <div className={styles["profile-control"]}>
+          <ListItem title={Locale.Profile.Region}>
+            <div
+              className={`${styles["profile-control"]} ${styles["profile-control-right"]}`}
+            >
               <Select
                 value={formState.region}
                 onChange={updateField("region")}
                 className={styles["profile-select"]}
               >
-                <option value="">未设置</option>
+                <option value="">{Locale.Profile.NotSet}</option>
                 {regionOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -519,19 +560,23 @@ export function Profile() {
             </div>
           </ListItem>
           <ListItem
-            title="保存设置"
+            title={Locale.Profile.Save.Title}
             subTitle={
               isLoggedIn
                 ? isSyncing
-                  ? "正在同步至后端"
-                  : "同步到后端并更新本地缓存"
-                : "未登录时仅保存到本地缓存"
+                  ? Locale.Profile.Save.Syncing
+                  : Locale.Profile.Save.SyncHint
+                : Locale.Profile.Save.LocalHint
             }
           >
             <div className={styles["profile-actions"]}>
               <IconButton
-                aria="保存设置"
-                text={isSyncing ? "同步中..." : "保存设置"}
+                aria={Locale.Profile.Save.Button}
+                text={
+                  isSyncing
+                    ? Locale.Profile.Save.SyncingButton
+                    : Locale.Profile.Save.Button
+                }
                 type="primary"
                 disabled={isSyncing}
                 onClick={handleSave}

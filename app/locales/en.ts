@@ -206,6 +206,68 @@ const en: LocaleType = {
   Sidebar: {
     Overview: "Overview",
   },
+  Profile: {
+    Title: "Profile",
+    SubTitle: "Manage your personal info and preferences",
+    DefaultName: "Hexagram User",
+    SubtitleLoggedIn:
+      "Welcome back, complete your profile to unlock more services",
+    SubtitleLoggedOut: "Sign in to sync to the cloud",
+    EmailNotLoggedIn: "Not signed in",
+    Username: {
+      Title: "Username",
+      SubTitle: "2-16 letters/numbers/underscore/space",
+      Placeholder: "Enter a username",
+      Error: "Username must be 2-16 letters, numbers, underscores, or spaces",
+    },
+    Avatar: "Avatar",
+    AvatarLabel: "User avatar",
+    Email: "Registered Email",
+    Logout: "Log out",
+    Login: "Sign in",
+    PaidLevel: "Paid Level",
+    ServiceLevel: "Service Level",
+    UpgradeTo: (level: string) => `Upgrade to ${level}`,
+    MaxLevel: "Already at the highest level",
+    Gender: {
+      Title: "Gender",
+      SubTitle: "You can edit without signing in",
+      Options: {
+        Male: "Male",
+        Female: "Female",
+        NonBinary: "Non-binary",
+        Private: "Prefer not to say",
+      },
+    },
+    Age: {
+      Title: "Age",
+      Error: "Please enter 1-120",
+      NotSet: "Not set",
+      Label: (age: number) => `${age}`,
+    },
+    PreferredLanguage: "Preferred Language",
+    Region: "Region",
+    NotSet: "Not set",
+    Save: {
+      Title: "Save Settings",
+      Syncing: "Syncing to backend",
+      SyncHint: "Sync to backend and update local cache",
+      LocalHint: "Only saved locally when signed out",
+      Button: "Save Settings",
+      SyncingButton: "Syncing...",
+    },
+    Toasts: {
+      LoadFailed: "Failed to load profile from backend. Using local cache.",
+      Logout: "Signed out",
+      NameInvalid:
+        "Username must be 2-16 letters, numbers, underscores, or spaces",
+      AgeInvalid: "Age must be a number between 1 and 120",
+      SavedLocal:
+        "Saved locally. It will sync after signing in, and clearing cache will lose it.",
+      Synced: "Settings synced to backend",
+      SyncFailed: "Sync failed. Saved locally instead.",
+    },
+  },
   Settings: {
     Title: "Settings",
     SubTitle: "All Settings",
