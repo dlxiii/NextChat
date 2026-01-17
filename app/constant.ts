@@ -47,6 +47,7 @@ export enum Path {
   Home = "/",
   Chat = "/chat",
   Settings = "/settings",
+  Profile = "/profile",
   NewChat = "/new-chat",
   Masks = "/masks",
   Plugins = "/plugins",

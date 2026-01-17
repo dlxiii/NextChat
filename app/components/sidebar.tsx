@@ -33,7 +33,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { isIOS, useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
-import { Card, List, ListItem, Popover, Selector, showConfirm } from "./ui-lib";
+import { Selector, showConfirm } from "./ui-lib";
 import clsx from "clsx";
 import { isMcpEnabled } from "../mcp/actions";
 import { Avatar } from "./emoji";
@@ -245,7 +245,6 @@ export function SideBar(props: { className?: string }) {
   useHotKey();
   const { onDragStart, shouldNarrow } = useDragSideBar();
   const [showDiscoverySelector, setshowDiscoverySelector] = useState(false);
-  const [showProfilePopover, setShowProfilePopover] = useState(false);
   const navigate = useNavigate();
   const config = useAppConfig();
   const { avatar, update } = config;
@@ -274,16 +273,6 @@ export function SideBar(props: { className?: string }) {
     };
     checkMcpStatus();
   }, []);
-
-  const profileItems = [
-    { label: "注册邮箱", value: "user@hexagram.ai" },
-    { label: "付费等级", value: "Free" },
-    { label: "服务等级", value: "Standard" },
-    { label: "性别", value: "未设置" },
-    { label: "年龄", value: "未设置" },
-    { label: "偏好语言", value: "中文" },
-    { label: "地区", value: "中国" },
-  ];
 
   return (
     <SideBarContainer
@@ -372,54 +361,18 @@ export function SideBar(props: { className?: string }) {
               />
             </div>
             <div className={styles["sidebar-action"]}>
-              <Popover
-                open={showProfilePopover}
-                onClose={() => setShowProfilePopover(false)}
-                content={
-                  <Card className={styles["sidebar-profile-card"]}>
-                    <>
-                      <div className={styles["sidebar-profile-header"]}>
-                        <div className={styles["sidebar-profile-avatar"]}>
-                          <Avatar avatar={avatar} />
-                        </div>
-                        <div>
-                          <div className={styles["sidebar-profile-name"]}>
-                            Hexagram 用户
-                          </div>
-                          <div className={styles["sidebar-profile-subtitle"]}>
-                            欢迎回来，完善资料以解锁更多服务
-                          </div>
-                        </div>
-                      </div>
-                      <div className={styles["sidebar-profile-list"]}>
-                        <List>
-                          {profileItems.map((item) => (
-                            <ListItem
-                              key={item.label}
-                              title={item.label}
-                              subTitle={item.value}
-                            />
-                          ))}
-                        </List>
-                      </div>
-                    </>
-                  </Card>
-                }
-              >
-                <div>
-                  <IconButton
-                    aria="用户资料"
-                    icon={
-                      <div className={styles["sidebar-profile-avatar"]}>
-                        <Avatar avatar={avatar} />
-                      </div>
-                    }
-                    shadow
-                    className={styles["sidebar-profile-button"]}
-                    onClick={() => setShowProfilePopover((visible) => !visible)}
-                  />
-                </div>
-              </Popover>
+              <Link to={Path.Profile}>
+                <IconButton
+                  aria="用户资料"
+                  icon={
+                    <div className={styles["sidebar-profile-avatar"]}>
+                      <Avatar avatar={avatar} />
+                    </div>
+                  }
+                  shadow
+                  className={styles["sidebar-profile-button"]}
+                />
+              </Link>
             </div>
             <div className={styles["sidebar-action"]}>
               <Link to={Path.Settings}>
