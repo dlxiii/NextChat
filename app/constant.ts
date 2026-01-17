@@ -37,6 +37,8 @@ export const CHATGLM_BASE_URL = "https://open.bigmodel.cn";
 export const SILICONFLOW_BASE_URL = "https://api.siliconflow.cn";
 
 export const AI302_BASE_URL = "https://api.302.ai";
+export const HEXAGRAM_BASE_URL =
+  process.env.NEXT_PUBLIC_HEXAGRAM_BASE_URL ?? "https://api.hexagram.work";
 
 export const CACHE_URL_PREFIX = "/api/cache";
 export const UPLOAD_URL = `${CACHE_URL_PREFIX}/upload`;
@@ -76,7 +78,7 @@ export enum ApiPath {
   SiliconFlow = "/api/siliconflow",
   "302.AI" = "/api/302ai",
   AuthLogin = "/api/auth/login",
-  AuthRegister = "/api/auth/register",
+  AuthRegister = `${HEXAGRAM_BASE_URL}/auth/register`,
 }
 
 export enum SlotID {
