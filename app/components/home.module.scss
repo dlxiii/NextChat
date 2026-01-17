@@ -362,33 +362,6 @@
   }
 }
 
-.sidebar-profile-card {
-  padding: 0;
-  overflow: hidden;
-}
-
-.sidebar-profile-header {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-  background: var(--second);
-  align-items: center;
-}
-
-.sidebar-profile-name {
-  font-weight: bolder;
-}
-
-.sidebar-profile-subtitle {
-  font-size: 12px;
-  opacity: 0.7;
-  margin-top: 4px;
-}
-
-.sidebar-profile-list {
-  padding: 0 4px 4px;
-}
-
 .loading-content {
   display: flex;
   flex-direction: column;
