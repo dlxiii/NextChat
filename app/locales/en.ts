@@ -63,6 +63,14 @@ const en: LocaleType = {
     RegisterMismatch: "Passwords do not match.",
     Success: "Signed in (placeholder).",
     RegisterSuccess: "Registered (placeholder).",
+    RegisterSuccessTitle: "Verify your email",
+    RegisterSuccessSubtitle:
+      "We've sent a verification email via Resend. Please check your inbox to activate your account.",
+    RegisterSuccessHint:
+      "If you don't see it, check your spam folder or try again later.",
+    RegisterSuccessCountdown: (seconds: number) =>
+      `Redirecting to sign in in ${seconds}s.`,
+    RegisterSuccessAction: "Back to Sign In",
     Failed: "Sign in failed. Please verify the backend API.",
     RegisterFailed: "Registration failed. Please verify the backend API.",
   },

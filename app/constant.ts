@@ -51,6 +51,7 @@ export enum Path {
   Masks = "/masks",
   Plugins = "/plugins",
   Auth = "/auth",
+  AuthRegisterSuccess = "/auth/register-success",
   Sd = "/sd",
   SdNew = "/sd-new",
   Artifacts = "/artifacts",

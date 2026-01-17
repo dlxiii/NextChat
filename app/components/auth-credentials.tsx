@@ -76,7 +76,11 @@ export function AuthCredentialsPage() {
           ? Locale.AuthCredential.Success
           : Locale.AuthCredential.RegisterSuccess,
       );
-      navigate(Path.Chat);
+      if (mode === "login") {
+        navigate(Path.Chat);
+      } else {
+        navigate(Path.AuthRegisterSuccess);
+      }
     } catch (error) {
       console.error("[Auth] sign-in failed", error);
       showToast(
