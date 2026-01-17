@@ -12,7 +12,12 @@ import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import { Avatar, AvatarPicker } from "./emoji";
 import { DEFAULT_PROFILE, useAppConfig, useProfileStore } from "../store";
-import Locale, { ALL_LANG_OPTIONS, AllLangs, type Lang } from "../locales";
+import Locale, {
+  ALL_LANG_OPTIONS,
+  AllLangs,
+  getLang,
+  type Lang,
+} from "../locales";
 import { clearAuthSession, getAuthSession } from "../utils/auth-session";
 
 const PAID_LEVELS = ["free", "pro", "premium"];
@@ -43,6 +48,10 @@ function normalizeLanguage(value: string) {
   return match ? match[0] : trimmed;
 }
 
+function resolvePreferredLanguage(value: string | undefined) {
+  return normalizeLanguage(value ?? "") || getLang();
+}
+
 function pickNextLevel(value: string, list: string[]) {
   const index = list.indexOf(value);
   if (index === -1) return list[0];
@@ -71,7 +80,7 @@ export function Profile() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [formState, setFormState] = useState<ProfileFormState>({
     displayName: profileState.displayName,
-    preferredLanguage: normalizeLanguage(profileState.preferredLanguage),
+    preferredLanguage: resolvePreferredLanguage(profileState.preferredLanguage),
     paidLevel: normalizeLevel(profileState.paidLevel, "free", PAID_LEVELS),
     serviceLevel: normalizeLevel(
       profileState.serviceLevel,
@@ -83,9 +92,9 @@ export function Profile() {
 
   const languageOptions = useMemo(
     () =>
-      Object.entries(ALL_LANG_OPTIONS).map(([value, label]) => ({
-        value,
-        label,
+      AllLangs.map((lang) => ({
+        value: lang,
+        label: ALL_LANG_OPTIONS[lang],
       })),
     [],
   );
@@ -93,7 +102,9 @@ export function Profile() {
   const syncFormFromStore = useCallback(() => {
     setFormState({
       displayName: profileState.displayName,
-      preferredLanguage: normalizeLanguage(profileState.preferredLanguage),
+      preferredLanguage: resolvePreferredLanguage(
+        profileState.preferredLanguage,
+      ),
       paidLevel: normalizeLevel(profileState.paidLevel, "free", PAID_LEVELS),
       serviceLevel: normalizeLevel(
         profileState.serviceLevel,
@@ -131,7 +142,7 @@ export function Profile() {
             data.displayName?.trim() ||
             profileSnapshot.displayName ||
             DEFAULT_PROFILE.displayName,
-          preferredLanguage: normalizeLanguage(
+          preferredLanguage: resolvePreferredLanguage(
             data.preferredLanguage ?? profileSnapshot.preferredLanguage,
           ),
           paidLevel: normalizeLevel(
@@ -381,22 +392,17 @@ export function Profile() {
             </div>
           </ListItem>
           <ListItem title={Locale.Profile.PreferredLanguage}>
-            <div
-              className={`${styles["profile-control"]} ${styles["profile-control-right"]}`}
+            <Select
+              aria-label={Locale.Profile.PreferredLanguage}
+              value={formState.preferredLanguage}
+              onChange={updateField("preferredLanguage")}
             >
-              <Select
-                value={formState.preferredLanguage}
-                onChange={updateField("preferredLanguage")}
-                className={styles["profile-select"]}
-              >
-                <option value="">{Locale.Profile.NotSet}</option>
-                {languageOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
-            </div>
+              {languageOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
           </ListItem>
           <ListItem
             title={Locale.Profile.Save.Title}
