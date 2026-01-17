@@ -53,6 +53,7 @@ export function AuthCredentialsPage() {
           : {
               email: email.trim(),
               password,
+              confirmPassword,
             };
 
       const endpoint = `${

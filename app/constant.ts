@@ -78,7 +78,7 @@ export const ApiPath = {
   SiliconFlow: "/api/siliconflow",
   "302.AI": "/api/302ai",
   AuthLogin: "/api/auth/login",
-  AuthRegister: `${HEXAGRAM_BASE_URL}/auth/register`,
+  AuthRegister: "/api/auth/register",
 } as const;
 
 export enum SlotID {
