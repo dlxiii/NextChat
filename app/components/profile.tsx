@@ -12,7 +12,7 @@ import { ErrorBoundary } from "./error";
 import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import { Avatar, AvatarPicker } from "./emoji";
-import { useAppConfig, useProfileStore } from "../store";
+import { DEFAULT_PROFILE, useAppConfig, useProfileStore } from "../store";
 import Locale, { ALL_LANG_OPTIONS, AllLangs, type Lang } from "../locales";
 import { clearAuthSession, getAuthSession } from "../utils/auth-session";
 import countries from "i18n-iso-countries";
@@ -20,7 +20,6 @@ import zhLocale from "i18n-iso-countries/langs/zh.json";
 
 const PAID_LEVELS = ["free", "pro", "premium"];
 const SERVICE_LEVELS = ["free", "standard", "enterprise"];
-const NAME_RULE = /^[\u4e00-\u9fa5A-Za-z0-9_ ]{2,16}$/;
 const REGION_LOCALE = "zh";
 
 countries.registerLocale(zhLocale);
@@ -168,7 +167,7 @@ export function Profile() {
           displayName:
             data.displayName?.trim() ||
             profileSnapshot.displayName ||
-            Locale.Profile.DefaultName,
+            DEFAULT_PROFILE.displayName,
           gender: data.gender ?? profileSnapshot.gender,
           age: data.age?.toString() ?? profileSnapshot.age,
           preferredLanguage: normalizeLanguage(
@@ -218,9 +217,6 @@ export function Profile() {
     updateProfile,
   ]);
 
-  const displayNameError =
-    formState.displayName.trim().length > 0 &&
-    !NAME_RULE.test(formState.displayName.trim());
   const ageValue = formState.age.trim();
   const ageNumber = Number(ageValue);
   const ageNumberValid = ageValue.length > 0 && !Number.isNaN(ageNumber);
@@ -250,17 +246,13 @@ export function Profile() {
   }, []);
 
   const handleSave = useCallback(async () => {
-    if (displayNameError) {
-      showToast(Locale.Profile.Toasts.NameInvalid);
-      return;
-    }
     if (ageInvalid) {
       showToast(Locale.Profile.Toasts.AgeInvalid);
       return;
     }
 
     const payload = {
-      displayName: formState.displayName.trim() || Locale.Profile.DefaultName,
+      displayName: formState.displayName.trim() || DEFAULT_PROFILE.displayName,
       gender: formState.gender,
       age: formState.age.trim(),
       preferredLanguage: formState.preferredLanguage.trim(),
@@ -312,7 +304,6 @@ export function Profile() {
     ageInvalid,
     authSession?.accessToken,
     authSession?.tokenType,
-    displayNameError,
     formState,
     isLoggedIn,
     updateProfile,
@@ -355,7 +346,7 @@ export function Profile() {
           </div>
           <div>
             <div className={styles["profile-name"]}>
-              {formState.displayName || Locale.Profile.DefaultName}
+              {formState.displayName || DEFAULT_PROFILE.displayName}
             </div>
             <div className={styles["profile-subtitle"]}>
               {isLoggedIn
@@ -365,27 +356,6 @@ export function Profile() {
           </div>
         </div>
         <List>
-          <ListItem
-            title={Locale.Profile.Username.Title}
-            subTitle={Locale.Profile.Username.SubTitle}
-          >
-            <div
-              className={`${styles["profile-control"]} ${styles["profile-control-right"]}`}
-            >
-              <input
-                type="text"
-                value={formState.displayName}
-                onChange={updateField("displayName")}
-                placeholder={Locale.Profile.Username.Placeholder}
-                className={styles["profile-input"]}
-              />
-              {displayNameError ? (
-                <div className={styles["profile-hint"]} data-error="true">
-                  {Locale.Profile.Username.Error}
-                </div>
-              ) : null}
-            </div>
-          </ListItem>
           <ListItem title={Locale.Profile.Avatar}>
             <Popover
               onClose={() => setShowAvatarPicker(false)}
