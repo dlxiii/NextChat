@@ -55,16 +55,15 @@ export function AuthCredentialsPage() {
               password,
             };
 
-      const response = await fetch(
-        mode === "login" ? ApiPath.AuthLogin : ApiPath.AuthRegister,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
+      const endpoint =
+        mode === "login" ? ApiPath.AuthLogin : ApiPath.AuthRegister;
+      const response = await fetch(String(endpoint), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) {
         throw new Error(await response.text());
