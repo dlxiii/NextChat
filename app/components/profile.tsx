@@ -12,16 +12,12 @@ import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import { Avatar, AvatarPicker } from "./emoji";
 import { DEFAULT_PROFILE, useAppConfig, useProfileStore } from "../store";
-import Locale, {
-  ALL_LANG_OPTIONS,
-  AllLangs,
-  getLang,
-  type Lang,
-} from "../locales";
+import Locale from "../locales";
 import { clearAuthSession, getAuthSession } from "../utils/auth-session";
 
 const PAID_LEVELS = ["free", "pro", "premium"];
 const SERVICE_LEVELS = ["free", "standard", "enterprise"];
+const GENDER_PREFERENCE_OPTIONS = ["male", "female"] as const;
 type ProfileFormState = {
   displayName: string;
   preferredLanguage: string;
@@ -36,20 +32,17 @@ function normalizeLevel(value: string, fallback: string, list: string[]) {
   return trimmed;
 }
 
-function normalizeLanguage(value: string) {
-  const trimmed = value?.trim();
+function normalizeGenderPreference(value: string) {
+  const trimmed = value?.trim().toLowerCase();
   if (!trimmed) return "";
-  if (AllLangs.includes(trimmed as Lang)) {
+  if (GENDER_PREFERENCE_OPTIONS.includes(trimmed as "male" | "female")) {
     return trimmed;
   }
-  const match = Object.entries(ALL_LANG_OPTIONS).find(
-    ([, label]) => label === trimmed,
-  );
-  return match ? match[0] : trimmed;
+  return "";
 }
 
-function resolvePreferredLanguage(value: string | undefined) {
-  return normalizeLanguage(value ?? "") || getLang();
+function resolveGenderPreference(value: string | undefined) {
+  return normalizeGenderPreference(value ?? "") || "male";
 }
 
 function pickNextLevel(value: string, list: string[]) {
@@ -80,7 +73,7 @@ export function Profile() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [formState, setFormState] = useState<ProfileFormState>({
     displayName: profileState.displayName,
-    preferredLanguage: resolvePreferredLanguage(profileState.preferredLanguage),
+    preferredLanguage: resolveGenderPreference(profileState.preferredLanguage),
     paidLevel: normalizeLevel(profileState.paidLevel, "free", PAID_LEVELS),
     serviceLevel: normalizeLevel(
       profileState.serviceLevel,
@@ -90,19 +83,24 @@ export function Profile() {
   });
   const emailSubtitle = isLoggedIn ? email : Locale.Profile.EmailNotLoggedIn;
 
-  const languageOptions = useMemo(
-    () =>
-      AllLangs.map((lang) => ({
-        value: lang,
-        label: ALL_LANG_OPTIONS[lang],
-      })),
+  const genderPreferenceOptions = useMemo(
+    () => [
+      {
+        value: "male",
+        label: Locale.Profile.GenderPreference.Options.Male,
+      },
+      {
+        value: "female",
+        label: Locale.Profile.GenderPreference.Options.Female,
+      },
+    ],
     [],
   );
 
   const syncFormFromStore = useCallback(() => {
     setFormState({
       displayName: profileState.displayName,
-      preferredLanguage: resolvePreferredLanguage(
+      preferredLanguage: resolveGenderPreference(
         profileState.preferredLanguage,
       ),
       paidLevel: normalizeLevel(profileState.paidLevel, "free", PAID_LEVELS),
@@ -142,7 +140,7 @@ export function Profile() {
             data.displayName?.trim() ||
             profileSnapshot.displayName ||
             DEFAULT_PROFILE.displayName,
-          preferredLanguage: resolvePreferredLanguage(
+          preferredLanguage: resolveGenderPreference(
             data.preferredLanguage ?? profileSnapshot.preferredLanguage,
           ),
           paidLevel: normalizeLevel(
@@ -190,7 +188,7 @@ export function Profile() {
       (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormState((prev) => ({
           ...prev,
-          [key]: event.target?.value ?? "",
+          [key]: event.currentTarget?.value ?? "",
         }));
       },
     [],
@@ -391,13 +389,16 @@ export function Profile() {
               />
             </div>
           </ListItem>
-          <ListItem title={Locale.Profile.PreferredLanguage}>
+          <ListItem
+            title={Locale.Profile.GenderPreference.Title}
+            subTitle={Locale.Profile.GenderPreference.SubTitle}
+          >
             <Select
-              aria-label={Locale.Profile.PreferredLanguage}
+              aria-label={Locale.Profile.GenderPreference.Title}
               value={formState.preferredLanguage}
               onChange={updateField("preferredLanguage")}
             >
-              {languageOptions.map((option) => (
+              {genderPreferenceOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>

@@ -24,7 +24,7 @@ const generateDefaultDisplayName = () => {
 
 export const createDefaultProfile = (): UserProfile => ({
   displayName: generateDefaultDisplayName(),
-  preferredLanguage: "cn",
+  preferredLanguage: "male",
   paidLevel: "free",
   serviceLevel: "free",
   lastSyncedAt: undefined,

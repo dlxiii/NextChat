@@ -241,7 +241,14 @@ const cn = {
       NotSet: "未设置",
       Label: (age: number) => `${age} 岁`,
     },
-    PreferredLanguage: "偏好语言",
+    GenderPreference: {
+      Title: "性别偏好",
+      SubTitle: "这对准确进行分析判断很有帮助",
+      Options: {
+        Male: "男性",
+        Female: "女性",
+      },
+    },
     Region: "地区",
     NotSet: "未设置",
     Save: {
