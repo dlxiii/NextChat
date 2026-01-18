@@ -1,9 +1,11 @@
 import { StoreKey } from "../constant";
+import { getLang } from "../locales";
 import { createPersistStore } from "../utils/store";
 
 export type UserProfile = {
   displayName: string;
   preferredLanguage: string;
+  genderPreference: string;
   paidLevel: string;
   serviceLevel: string;
   lastSyncedAt?: number;
@@ -24,7 +26,8 @@ const generateDefaultDisplayName = () => {
 
 export const createDefaultProfile = (): UserProfile => ({
   displayName: generateDefaultDisplayName(),
-  preferredLanguage: "male",
+  preferredLanguage: getLang(),
+  genderPreference: "male",
   paidLevel: "free",
   serviceLevel: "free",
   lastSyncedAt: undefined,
