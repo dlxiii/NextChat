@@ -18,7 +18,8 @@ import { clearAuthSession, getAuthSession } from "../utils/auth-session";
 const PAID_LEVELS = ["free", "pro", "premium"];
 const SERVICE_LEVELS = ["free", "standard", "enterprise"];
 const GENDER_PREFERENCE_OPTIONS = ["male", "female"] as const;
-type ProfileFormState = {
+const AUTO_SYNC = false;
+type ProfilePayload = {
   displayName: string;
   preferredLanguage: string;
   genderPreference: string;
@@ -28,8 +29,7 @@ type ProfileFormState = {
 
 function normalizeLevel(value: string, fallback: string, list: string[]) {
   const trimmed = value?.trim();
-  if (!trimmed) return fallback;
-  if (!list.includes(trimmed)) return fallback;
+  if (!trimmed || !list.includes(trimmed)) return fallback;
   return trimmed;
 }
 
@@ -71,16 +71,14 @@ export function Profile() {
   const isLoggedIn = Boolean(authSession?.accessToken);
   const email = authSession?.email?.trim() || Locale.Profile.EmailNotLoggedIn;
   const [isSyncing, setIsSyncing] = useState(false);
-  // Initialize once from the store; avoid syncing on every change so edits
-  // (like gender selection) are not overwritten by stale store values.
-  const [formState, setFormState] = useState<ProfileFormState>({
-    displayName,
-    preferredLanguage,
-    genderPreference: resolveGenderPreference(genderPreference),
-    paidLevel: normalizeLevel(paidLevel, "free", PAID_LEVELS),
-    serviceLevel: normalizeLevel(serviceLevel, "free", SERVICE_LEVELS),
-  });
   const emailSubtitle = isLoggedIn ? email : Locale.Profile.EmailNotLoggedIn;
+  const resolvedGenderPreference = resolveGenderPreference(genderPreference);
+  const normalizedPaidLevel = normalizeLevel(paidLevel, "free", PAID_LEVELS);
+  const normalizedServiceLevel = normalizeLevel(
+    serviceLevel,
+    "free",
+    SERVICE_LEVELS,
+  );
 
   const genderPreferenceOptions = useMemo(
     () => [
@@ -112,7 +110,7 @@ export function Profile() {
         if (!res.ok) {
           throw new Error("profile sync failed");
         }
-        const data = (await res.json()) as Partial<ProfileFormState>;
+        const data = (await res.json()) as Partial<ProfilePayload>;
         if (canceled) return;
         const profileSnapshot = useProfileStore.getState();
         const normalized = {
@@ -144,7 +142,6 @@ export function Profile() {
           profile.serviceLevel = normalized.serviceLevel;
           profile.lastSyncedAt = Date.now();
         });
-        setFormState(normalized);
       } catch (error) {
         if (!canceled) {
           showToast(Locale.Profile.Toasts.LoadFailed);
@@ -166,17 +163,6 @@ export function Profile() {
     updateProfile,
   ]);
 
-  const updateField = useCallback(
-    (key: keyof ProfileFormState) =>
-      (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setFormState((prev) => ({
-          ...prev,
-          [key]: event.currentTarget?.value ?? "",
-        }));
-      },
-    [],
-  );
-
   const handleLogout = useCallback(() => {
     clearAuthSession();
     setAuthSession(null);
@@ -185,20 +171,12 @@ export function Profile() {
 
   const handleSave = useCallback(async () => {
     const payload = {
-      displayName: formState.displayName.trim() || DEFAULT_PROFILE.displayName,
-      preferredLanguage: formState.preferredLanguage.trim(),
-      genderPreference: formState.genderPreference.trim(),
-      paidLevel: formState.paidLevel,
-      serviceLevel: formState.serviceLevel,
+      displayName: displayName.trim() || DEFAULT_PROFILE.displayName,
+      preferredLanguage: preferredLanguage.trim(),
+      genderPreference: resolveGenderPreference(genderPreference),
+      paidLevel: normalizeLevel(paidLevel, "free", PAID_LEVELS),
+      serviceLevel: normalizeLevel(serviceLevel, "free", SERVICE_LEVELS),
     };
-
-    updateProfile((profile) => {
-      profile.displayName = payload.displayName;
-      profile.preferredLanguage = payload.preferredLanguage;
-      profile.genderPreference = payload.genderPreference;
-      profile.paidLevel = payload.paidLevel;
-      profile.serviceLevel = payload.serviceLevel;
-    });
 
     if (!isLoggedIn || !authSession?.accessToken) {
       showToast(Locale.Profile.Toasts.SavedLocal);
@@ -232,18 +210,80 @@ export function Profile() {
   }, [
     authSession?.accessToken,
     authSession?.tokenType,
-    formState,
+    displayName,
+    genderPreference,
     isLoggedIn,
+    paidLevel,
+    preferredLanguage,
+    serviceLevel,
     updateProfile,
   ]);
 
-  const nextPaidLevel = pickNextLevel(formState.paidLevel, PAID_LEVELS);
+  useEffect(() => {
+    if (!AUTO_SYNC || !isLoggedIn || !authSession?.accessToken) return;
+    if (isSyncing) return;
+    const controller = new AbortController();
+    const payload = {
+      displayName: displayName.trim() || DEFAULT_PROFILE.displayName,
+      preferredLanguage: preferredLanguage.trim(),
+      genderPreference: resolveGenderPreference(genderPreference),
+      paidLevel: normalizeLevel(paidLevel, "free", PAID_LEVELS),
+      serviceLevel: normalizeLevel(serviceLevel, "free", SERVICE_LEVELS),
+    };
+    const timer = window.setTimeout(async () => {
+      try {
+        setIsSyncing(true);
+        const res = await fetch("/api/user/profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `${
+              authSession?.tokenType ?? "Bearer"
+            } ${authSession?.accessToken}`,
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        });
+        if (!res.ok) {
+          throw new Error("profile save failed");
+        }
+        updateProfile((profile) => {
+          profile.lastSyncedAt = Date.now();
+        });
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          showToast(Locale.Profile.Toasts.SyncFailed);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsSyncing(false);
+        }
+      }
+    }, 1000);
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [
+    authSession?.accessToken,
+    authSession?.tokenType,
+    displayName,
+    genderPreference,
+    isLoggedIn,
+    isSyncing,
+    paidLevel,
+    preferredLanguage,
+    serviceLevel,
+    updateProfile,
+  ]);
+
+  const nextPaidLevel = pickNextLevel(normalizedPaidLevel, PAID_LEVELS);
   const nextServiceLevel = pickNextLevel(
-    formState.serviceLevel,
+    normalizedServiceLevel,
     SERVICE_LEVELS,
   );
-  const paidAtMax = isAtMaxLevel(formState.paidLevel, PAID_LEVELS);
-  const serviceAtMax = isAtMaxLevel(formState.serviceLevel, SERVICE_LEVELS);
+  const paidAtMax = isAtMaxLevel(normalizedPaidLevel, PAID_LEVELS);
+  const serviceAtMax = isAtMaxLevel(normalizedServiceLevel, SERVICE_LEVELS);
 
   return (
     <ErrorBoundary>
@@ -274,7 +314,7 @@ export function Profile() {
           </div>
           <div>
             <div className={styles["profile-name"]}>
-              {formState.displayName || DEFAULT_PROFILE.displayName}
+              {displayName || DEFAULT_PROFILE.displayName}
             </div>
             <div className={styles["profile-subtitle"]}>
               {isLoggedIn
@@ -330,7 +370,7 @@ export function Profile() {
           </ListItem>
           <ListItem
             title={Locale.Profile.PaidLevel}
-            subTitle={formState.paidLevel}
+            subTitle={normalizedPaidLevel}
           >
             <div className={styles["profile-actions"]}>
               <IconButton
@@ -343,17 +383,16 @@ export function Profile() {
                 type="primary"
                 disabled={paidAtMax}
                 onClick={() =>
-                  setFormState((prev) => ({
-                    ...prev,
-                    paidLevel: nextPaidLevel,
-                  }))
+                  updateProfile((profile) => {
+                    profile.paidLevel = nextPaidLevel;
+                  })
                 }
               />
             </div>
           </ListItem>
           <ListItem
             title={Locale.Profile.ServiceLevel}
-            subTitle={formState.serviceLevel}
+            subTitle={normalizedServiceLevel}
           >
             <div className={styles["profile-actions"]}>
               <IconButton
@@ -366,10 +405,9 @@ export function Profile() {
                 type="primary"
                 disabled={serviceAtMax}
                 onClick={() =>
-                  setFormState((prev) => ({
-                    ...prev,
-                    serviceLevel: nextServiceLevel,
-                  }))
+                  updateProfile((profile) => {
+                    profile.serviceLevel = nextServiceLevel;
+                  })
                 }
               />
             </div>
@@ -380,8 +418,14 @@ export function Profile() {
           >
             <Select
               aria-label={Locale.Profile.GenderPreference.Title}
-              value={formState.genderPreference}
-              onChange={updateField("genderPreference")}
+              value={resolvedGenderPreference}
+              onChange={(event) =>
+                updateProfile((profile) => {
+                  profile.genderPreference = resolveGenderPreference(
+                    event.currentTarget.value,
+                  );
+                })
+              }
             >
               {genderPreferenceOptions.map((option) => (
                 <option key={option.value} value={option.value}>
