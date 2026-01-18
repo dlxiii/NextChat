@@ -245,7 +245,14 @@ const en: LocaleType = {
       NotSet: "Not set",
       Label: (age: number) => `${age}`,
     },
-    PreferredLanguage: "Preferred Language",
+    GenderPreference: {
+      Title: "Gender Preference",
+      SubTitle: "This helps improve accurate analysis and judgment",
+      Options: {
+        Male: "Male",
+        Female: "Female",
+      },
+    },
     Region: "Region",
     NotSet: "Not set",
     Save: {
