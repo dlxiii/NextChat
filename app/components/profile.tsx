@@ -29,7 +29,7 @@ type ProfileFormState = {
 function normalizeLevel(value: string, fallback: string, list: string[]) {
   const trimmed = value?.trim();
   if (!trimmed) return fallback;
-  if (!list.includes(trimmed)) return trimmed;
+  if (!list.includes(trimmed)) return fallback;
   return trimmed;
 }
 
@@ -71,6 +71,8 @@ export function Profile() {
   const isLoggedIn = Boolean(authSession?.accessToken);
   const email = authSession?.email?.trim() || Locale.Profile.EmailNotLoggedIn;
   const [isSyncing, setIsSyncing] = useState(false);
+  // Initialize once from the store; avoid syncing on every change so edits
+  // (like gender selection) are not overwritten by stale store values.
   const [formState, setFormState] = useState<ProfileFormState>({
     displayName,
     preferredLanguage,
@@ -93,26 +95,6 @@ export function Profile() {
     ],
     [],
   );
-
-  const syncFormFromStore = useCallback(() => {
-    setFormState({
-      displayName,
-      preferredLanguage,
-      genderPreference: resolveGenderPreference(genderPreference),
-      paidLevel: normalizeLevel(paidLevel, "free", PAID_LEVELS),
-      serviceLevel: normalizeLevel(serviceLevel, "free", SERVICE_LEVELS),
-    });
-  }, [
-    displayName,
-    genderPreference,
-    paidLevel,
-    preferredLanguage,
-    serviceLevel,
-  ]);
-
-  useEffect(() => {
-    syncFormFromStore();
-  }, [syncFormFromStore]);
 
   useEffect(() => {
     if (!isLoggedIn || !authSession?.accessToken) return;
