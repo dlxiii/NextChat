@@ -61,28 +61,22 @@ export function Profile() {
   const navigate = useNavigate();
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const config = useAppConfig();
-  const profileState = useProfileStore((state) => ({
-    displayName: state.displayName,
-    preferredLanguage: state.preferredLanguage,
-    genderPreference: state.genderPreference,
-    paidLevel: state.paidLevel,
-    serviceLevel: state.serviceLevel,
-  }));
+  const displayName = useProfileStore((state) => state.displayName);
+  const preferredLanguage = useProfileStore((state) => state.preferredLanguage);
+  const genderPreference = useProfileStore((state) => state.genderPreference);
+  const paidLevel = useProfileStore((state) => state.paidLevel);
+  const serviceLevel = useProfileStore((state) => state.serviceLevel);
   const updateProfile = useProfileStore((state) => state.updateProfile);
   const [authSession, setAuthSession] = useState(() => getAuthSession());
   const isLoggedIn = Boolean(authSession?.accessToken);
   const email = authSession?.email?.trim() || Locale.Profile.EmailNotLoggedIn;
   const [isSyncing, setIsSyncing] = useState(false);
   const [formState, setFormState] = useState<ProfileFormState>({
-    displayName: profileState.displayName,
-    preferredLanguage: profileState.preferredLanguage,
-    genderPreference: resolveGenderPreference(profileState.genderPreference),
-    paidLevel: normalizeLevel(profileState.paidLevel, "free", PAID_LEVELS),
-    serviceLevel: normalizeLevel(
-      profileState.serviceLevel,
-      "free",
-      SERVICE_LEVELS,
-    ),
+    displayName,
+    preferredLanguage,
+    genderPreference: resolveGenderPreference(genderPreference),
+    paidLevel: normalizeLevel(paidLevel, "free", PAID_LEVELS),
+    serviceLevel: normalizeLevel(serviceLevel, "free", SERVICE_LEVELS),
   });
   const emailSubtitle = isLoggedIn ? email : Locale.Profile.EmailNotLoggedIn;
 
@@ -102,17 +96,19 @@ export function Profile() {
 
   const syncFormFromStore = useCallback(() => {
     setFormState({
-      displayName: profileState.displayName,
-      preferredLanguage: profileState.preferredLanguage,
-      genderPreference: resolveGenderPreference(profileState.genderPreference),
-      paidLevel: normalizeLevel(profileState.paidLevel, "free", PAID_LEVELS),
-      serviceLevel: normalizeLevel(
-        profileState.serviceLevel,
-        "free",
-        SERVICE_LEVELS,
-      ),
+      displayName,
+      preferredLanguage,
+      genderPreference: resolveGenderPreference(genderPreference),
+      paidLevel: normalizeLevel(paidLevel, "free", PAID_LEVELS),
+      serviceLevel: normalizeLevel(serviceLevel, "free", SERVICE_LEVELS),
     });
-  }, [profileState]);
+  }, [
+    displayName,
+    genderPreference,
+    paidLevel,
+    preferredLanguage,
+    serviceLevel,
+  ]);
 
   useEffect(() => {
     syncFormFromStore();
