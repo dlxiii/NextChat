@@ -21,6 +21,7 @@ const GENDER_PREFERENCE_OPTIONS = ["male", "female"] as const;
 type ProfileFormState = {
   displayName: string;
   preferredLanguage: string;
+  genderPreference: string;
   paidLevel: string;
   serviceLevel: string;
 };
@@ -63,6 +64,7 @@ export function Profile() {
   const profileState = useProfileStore((state) => ({
     displayName: state.displayName,
     preferredLanguage: state.preferredLanguage,
+    genderPreference: state.genderPreference,
     paidLevel: state.paidLevel,
     serviceLevel: state.serviceLevel,
   }));
@@ -73,7 +75,8 @@ export function Profile() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [formState, setFormState] = useState<ProfileFormState>({
     displayName: profileState.displayName,
-    preferredLanguage: resolveGenderPreference(profileState.preferredLanguage),
+    preferredLanguage: profileState.preferredLanguage,
+    genderPreference: resolveGenderPreference(profileState.genderPreference),
     paidLevel: normalizeLevel(profileState.paidLevel, "free", PAID_LEVELS),
     serviceLevel: normalizeLevel(
       profileState.serviceLevel,
@@ -100,9 +103,8 @@ export function Profile() {
   const syncFormFromStore = useCallback(() => {
     setFormState({
       displayName: profileState.displayName,
-      preferredLanguage: resolveGenderPreference(
-        profileState.preferredLanguage,
-      ),
+      preferredLanguage: profileState.preferredLanguage,
+      genderPreference: resolveGenderPreference(profileState.genderPreference),
       paidLevel: normalizeLevel(profileState.paidLevel, "free", PAID_LEVELS),
       serviceLevel: normalizeLevel(
         profileState.serviceLevel,
@@ -140,8 +142,10 @@ export function Profile() {
             data.displayName?.trim() ||
             profileSnapshot.displayName ||
             DEFAULT_PROFILE.displayName,
-          preferredLanguage: resolveGenderPreference(
+          preferredLanguage:
             data.preferredLanguage ?? profileSnapshot.preferredLanguage,
+          genderPreference: resolveGenderPreference(
+            data.genderPreference ?? profileSnapshot.genderPreference,
           ),
           paidLevel: normalizeLevel(
             data.paidLevel ?? profileSnapshot.paidLevel,
@@ -157,6 +161,7 @@ export function Profile() {
         updateProfile((profile) => {
           profile.displayName = normalized.displayName;
           profile.preferredLanguage = normalized.preferredLanguage;
+          profile.genderPreference = normalized.genderPreference;
           profile.paidLevel = normalized.paidLevel;
           profile.serviceLevel = normalized.serviceLevel;
           profile.lastSyncedAt = Date.now();
@@ -204,6 +209,7 @@ export function Profile() {
     const payload = {
       displayName: formState.displayName.trim() || DEFAULT_PROFILE.displayName,
       preferredLanguage: formState.preferredLanguage.trim(),
+      genderPreference: formState.genderPreference.trim(),
       paidLevel: formState.paidLevel,
       serviceLevel: formState.serviceLevel,
     };
@@ -211,6 +217,7 @@ export function Profile() {
     updateProfile((profile) => {
       profile.displayName = payload.displayName;
       profile.preferredLanguage = payload.preferredLanguage;
+      profile.genderPreference = payload.genderPreference;
       profile.paidLevel = payload.paidLevel;
       profile.serviceLevel = payload.serviceLevel;
     });
@@ -395,8 +402,8 @@ export function Profile() {
           >
             <Select
               aria-label={Locale.Profile.GenderPreference.Title}
-              value={formState.preferredLanguage}
-              onChange={updateField("preferredLanguage")}
+              value={formState.genderPreference}
+              onChange={updateField("genderPreference")}
             >
               {genderPreferenceOptions.map((option) => (
                 <option key={option.value} value={option.value}>
