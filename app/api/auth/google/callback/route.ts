@@ -8,13 +8,12 @@ const OAUTH_STATE_COOKIE = "hexagram-google-oauth-state";
 const OAUTH_SESSION_COOKIE = "hexagram-google-oauth-session";
 
 /**
- * Google OAuth 回调端点：
+ * Google OAuth 回调端点。
  *
  * 实现流程说明：
- * 1) 验证 state 与 cookie nonce 是否匹配，阻断 CSRF。
- * 2) 将 query 原样转发给上游 `/api/auth/google/callback`，由上游完成 code 换 token。
- * 3) 把 token payload 以 HttpOnly cookie 临时落地，避免把 access token 暴露到 URL。
- * 4) 跳转到 `/#/auth`，由前端调用 `/api/auth/oauth-session` 拉取并持久化会话。
+ * 1) 校验 state 与 nonce cookie，阻断 CSRF。
+ * 2) 将 callback query 转发到上游换 token（兼容多个上游回调路径）。
+ * 3) 将会话结果写入短时 HttpOnly cookie，随后重定向到 /#/auth。
  */
 export async function GET(req: NextRequest) {
   const parsedState = decodeOAuthState(req.nextUrl.searchParams.get("state"));
@@ -25,19 +24,30 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL("/#/auth?oauth_error=state", req.url));
   }
 
-  const upstreamUrl = new URL(`${AUTH_BASE_URL}/api/auth/google/callback`);
-  req.nextUrl.searchParams.forEach((value, key) => {
-    upstreamUrl.searchParams.append(key, value);
-  });
+  const upstreamCandidates = [
+    `${AUTH_BASE_URL}/api/auth/google/callback`,
+    `${AUTH_BASE_URL}/api/auth/google`,
+  ];
 
-  const upstreamRes = await fetch(upstreamUrl.toString(), {
-    method: "GET",
-    redirect: "manual",
-    headers: { Accept: "application/json" },
-  });
+  let payload: ReturnType<typeof pickSessionPayload> = null;
 
-  const bodyText = await upstreamRes.text();
-  const payload = pickSessionPayload(bodyText);
+  for (const candidate of upstreamCandidates) {
+    const upstreamUrl = new URL(candidate);
+    req.nextUrl.searchParams.forEach((value, key) => {
+      upstreamUrl.searchParams.append(key, value);
+    });
+
+    const upstreamRes = await fetch(upstreamUrl.toString(), {
+      method: "GET",
+      redirect: "manual",
+      headers: { Accept: "application/json" },
+    });
+
+    const bodyText = await upstreamRes.text();
+    payload = pickSessionPayload(bodyText);
+    if (payload) break;
+  }
+
   cookies().delete(OAUTH_STATE_COOKIE);
 
   if (!payload) {
