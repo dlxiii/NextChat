@@ -316,6 +316,7 @@ export function AuthCredentialsPage() {
 
             <IconButton
               type="primary"
+              nativeType="submit"
               text={submitLabel}
               className={styles["auth-credentials-submit"]}
               disabled={isSubmitting}
