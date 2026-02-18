@@ -677,6 +677,16 @@ export function Settings() {
   }, []);
 
   const clientConfig = useMemo(() => getClientConfig(), []);
+  const settingsVisibility = useMemo(
+    () =>
+      clientConfig?.settingsVisibility ?? {
+        showSyncSection: false,
+        showModelSection: false,
+        showRealtimeSection: false,
+        showTTSSection: false,
+      },
+    [clientConfig],
+  );
   const showAccessCode = enabledAccessControl && !clientConfig?.isApp;
 
   const accessCodeComponent = showAccessCode && (
@@ -1749,7 +1759,7 @@ export function Settings() {
           </ListItem>
         </List>
 
-        <SyncItems />
+        {settingsVisibility.showSyncSection && <SyncItems />}
 
         <List>
           <ListItem
@@ -1922,42 +1932,48 @@ export function Settings() {
           </ListItem>
         </List>
 
-        <List>
-          <ModelConfigList
-            modelConfig={config.modelConfig}
-            updateConfig={(updater) => {
-              const modelConfig = { ...config.modelConfig };
-              updater(modelConfig);
-              config.update((config) => (config.modelConfig = modelConfig));
-            }}
-          />
-        </List>
+        {settingsVisibility.showModelSection && (
+          <List>
+            <ModelConfigList
+              modelConfig={config.modelConfig}
+              updateConfig={(updater) => {
+                const modelConfig = { ...config.modelConfig };
+                updater(modelConfig);
+                config.update((config) => (config.modelConfig = modelConfig));
+              }}
+            />
+          </List>
+        )}
 
         {shouldShowPromptModal && (
           <UserPromptModal onClose={() => setShowPromptModal(false)} />
         )}
-        <List>
-          <RealtimeConfigList
-            realtimeConfig={config.realtimeConfig}
-            updateConfig={(updater) => {
-              const realtimeConfig = { ...config.realtimeConfig };
-              updater(realtimeConfig);
-              config.update(
-                (config) => (config.realtimeConfig = realtimeConfig),
-              );
-            }}
-          />
-        </List>
-        <List>
-          <TTSConfigList
-            ttsConfig={config.ttsConfig}
-            updateConfig={(updater) => {
-              const ttsConfig = { ...config.ttsConfig };
-              updater(ttsConfig);
-              config.update((config) => (config.ttsConfig = ttsConfig));
-            }}
-          />
-        </List>
+        {settingsVisibility.showRealtimeSection && (
+          <List>
+            <RealtimeConfigList
+              realtimeConfig={config.realtimeConfig}
+              updateConfig={(updater) => {
+                const realtimeConfig = { ...config.realtimeConfig };
+                updater(realtimeConfig);
+                config.update(
+                  (config) => (config.realtimeConfig = realtimeConfig),
+                );
+              }}
+            />
+          </List>
+        )}
+        {settingsVisibility.showTTSSection && (
+          <List>
+            <TTSConfigList
+              ttsConfig={config.ttsConfig}
+              updateConfig={(updater) => {
+                const ttsConfig = { ...config.ttsConfig };
+                updater(ttsConfig);
+                config.update((config) => (config.ttsConfig = ttsConfig));
+              }}
+            />
+          </List>
+        )}
 
         <DangerItems />
       </div>
