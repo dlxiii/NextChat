@@ -1,8 +1,8 @@
 import styles from "./auth-credentials.module.scss";
 import { IconButton } from "./button";
 import { showToast } from "./ui-lib";
-import { type FormEvent, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { type FormEvent, useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ApiPath, Path } from "../constant";
 import Locale from "../locales";
 import LeftIcon from "../icons/left.svg";
@@ -12,12 +12,17 @@ import { getAuthSession, persistAuthSession } from "../utils/auth-session";
 
 export function AuthCredentialsPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mode, setMode] = useState<"login" | "register">("login");
+  const [isOAuthSubmitting, setIsOAuthSubmitting] = useState(false);
+
+  const isGoogleOAuthEnabled =
+    process.env.NEXT_PUBLIC_ENABLE_GOOGLE_OAUTH === "true";
 
   useEffect(() => {
     const session = getAuthSession();
@@ -25,6 +30,83 @@ export function AuthCredentialsPage() {
       navigate(Path.Chat);
     }
   }, [navigate]);
+
+  /**
+   * Completes Google OAuth callback handling on the auth page.
+   *
+   * Inputs:
+   * - `search`: query string from the hash-router location.
+   *
+   * Outputs:
+   * - Returns `true` if current URL is a Google OAuth callback and was fully handled.
+   * - Returns `false` when URL is unrelated to Google OAuth so normal page logic continues.
+   *
+   * Error handling:
+   * - Handles explicit provider errors (`access_denied`, `state_mismatch`, generic failures).
+   * - Ignores incomplete callbacks without tokens to avoid false-positive error prompts.
+   */
+  const completeGoogleOAuthCallback = useCallback(
+    (search: string): boolean => {
+      const params = new URLSearchParams(search);
+      const provider = params.get("provider");
+
+      if (provider !== "google") return false;
+
+      const errorCode = params.get("error");
+      if (errorCode) {
+        const errorMessage =
+          errorCode === "access_denied"
+            ? Locale.AuthCredential.GoogleOAuthCancelled
+            : errorCode === "state_mismatch"
+            ? Locale.AuthCredential.GoogleOAuthStateMismatch
+            : Locale.AuthCredential.GoogleOAuthFailed;
+        showToast(errorMessage);
+        navigate(Path.Auth, { replace: true });
+        return true;
+      }
+
+      const accessToken = params.get("access_token");
+      if (!accessToken) {
+        return true;
+      }
+
+      // Keep compatibility with existing login session shape.
+      persistAuthSession(
+        {
+          accessToken,
+          tokenType: params.get("token_type") ?? undefined,
+          email: params.get("email") ?? undefined,
+          userId: params.get("userId") ?? undefined,
+          roles: params.get("roles")?.split(",").filter(Boolean),
+          plan: params.get("plan") ?? undefined,
+          expiresIn: params.get("expires_in")
+            ? Number(params.get("expires_in"))
+            : undefined,
+        },
+        true,
+      );
+
+      showToast(Locale.AuthCredential.GoogleOAuthSuccess);
+      navigate(Path.Chat, { replace: true });
+      return true;
+    },
+    [navigate],
+  );
+
+  useEffect(() => {
+    completeGoogleOAuthCallback(location.search);
+  }, [completeGoogleOAuthCallback, location.search]);
+
+  const handleGoogleOAuth = () => {
+    if (!isGoogleOAuthEnabled) {
+      showToast(Locale.AuthCredential.GoogleOAuthDisabled);
+      return;
+    }
+
+    setIsOAuthSubmitting(true);
+    // Redirect browser to start endpoint; backend handles OAuth state + PKCE.
+    window.location.href = ApiPath.AuthGoogleOAuthStart;
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -98,6 +180,7 @@ export function AuthCredentialsPage() {
             userId: responseJson.userId as string | undefined,
             roles: responseJson.roles as string[] | undefined,
             plan: responseJson.plan as string | undefined,
+            expiresIn: responseJson.expires_in as number | undefined,
           },
           remember,
         );
@@ -276,7 +359,15 @@ export function AuthCredentialsPage() {
             </div>
 
             <div className={styles["auth-credentials-oauth"]}>
-              <IconButton text={Locale.AuthCredential.OAuthGoogle} disabled />
+              <IconButton
+                text={
+                  isOAuthSubmitting
+                    ? Locale.AuthCredential.GoogleOAuthRedirecting
+                    : Locale.AuthCredential.OAuthGoogle
+                }
+                disabled={isOAuthSubmitting || !isGoogleOAuthEnabled}
+                onClick={handleGoogleOAuth}
+              />
               <IconButton text={Locale.AuthCredential.OAuthApple} disabled />
               <IconButton
                 text={Locale.AuthCredential.OAuthMicrosoft}

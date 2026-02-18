@@ -5,6 +5,7 @@ export type AuthSession = {
   userId?: string;
   roles?: string[];
   plan?: string;
+  expiresIn?: number;
 };
 
 const AUTH_SESSION_KEY = "hexagram-auth-session";
