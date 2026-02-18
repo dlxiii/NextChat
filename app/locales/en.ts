@@ -53,7 +53,7 @@ const en: LocaleType = {
     RegisterSubmit: "Create Account",
     RegisterSubmitting: "Creating Account...",
     Divider: "Or continue with",
-    OAuthGoogle: "Continue with Google",
+    OAuthGoogle: "Google (coming soon)",
     OAuthGithub: "GitHub (coming soon)",
     OAuthMicrosoft: "Microsoft (coming soon)",
     OAuthApple: "Apple (coming soon)",

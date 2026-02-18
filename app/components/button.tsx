@@ -10,15 +10,6 @@ export function IconButton(props: {
   onClick?: () => void;
   icon?: JSX.Element;
   type?: ButtonType;
-  /**
-   * 原生 button 的 `type` 属性。
-   *
-   * 设计说明：
-   * - 默认使用 `button`，避免在 `<form>` 中未显式声明时被浏览器当作 `submit`，
-   *   导致“点击普通功能按钮却触发表单提交”的副作用。
-   * - 需要提交表单时，由调用方显式传入 `submit`。
-   */
-  nativeType?: "button" | "submit" | "reset";
   text?: string;
   bordered?: boolean;
   shadow?: boolean;
@@ -32,7 +23,6 @@ export function IconButton(props: {
 }) {
   return (
     <button
-      type={props.nativeType ?? "button"}
       className={clsx(
         "clickable",
         styles["icon-button"],
