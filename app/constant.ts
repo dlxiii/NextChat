@@ -81,8 +81,6 @@ export const ApiPath = {
   "302.AI": "/api/302ai",
   AuthLogin: "/api/auth/login",
   AuthRegister: "/api/auth/register",
-  AuthGoogleOAuthStart: "/api/auth/oauth/google/start",
-  AuthGoogleOAuthCallback: "/api/auth/oauth/google/callback",
 } as const;
 
 export enum SlotID {
