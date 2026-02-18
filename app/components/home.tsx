@@ -53,6 +53,13 @@ const Profile = dynamic(async () => (await import("./profile")).Profile, {
   loading: () => <Loading noLogo />,
 });
 
+const UpgradePage = dynamic(
+  async () => (await import("./upgrade")).UpgradePage,
+  {
+    loading: () => <Loading noLogo />,
+  },
+);
+
 const Chat = dynamic(async () => (await import("./chat")).Chat, {
   loading: () => <Loading noLogo />,
 });
@@ -217,6 +224,7 @@ function Screen() {
             <Route path={Path.Chat} element={<Chat />} />
             <Route path={Path.Settings} element={<Settings />} />
             <Route path={Path.Profile} element={<Profile />} />
+            <Route path={Path.Upgrade} element={<UpgradePage />} />
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
           </Routes>
         </WindowContent>

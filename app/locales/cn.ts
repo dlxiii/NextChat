@@ -225,6 +225,12 @@ const cn = {
     ServiceLevel: "服务等级",
     UpgradeTo: (level: string) => `升级到 ${level}`,
     MaxLevel: "已是最高等级",
+    UpgradePage: {
+      Title: "升级中心",
+      SubTitle: "付费升级功能即将上线",
+      Description: "升级支付流程正在开发中，暂时无法直接完成升级。",
+      BackToProfile: "返回资料页",
+    },
     Gender: {
       Title: "性别",
       SubTitle: "未登录也可编辑",
@@ -267,6 +273,7 @@ const cn = {
       SavedLocal: "已保存到本地缓存，登录后才会同步，清理缓存将丢失",
       Synced: "设置已同步到后端",
       SyncFailed: "同步失败，已保存在本地缓存",
+      UpgradeLoginRequired: "请先登录后再管理等级",
     },
   },
   Settings: {

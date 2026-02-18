@@ -229,6 +229,13 @@ const en: LocaleType = {
     ServiceLevel: "Service Level",
     UpgradeTo: (level: string) => `Upgrade to ${level}`,
     MaxLevel: "Already at the highest level",
+    UpgradePage: {
+      Title: "Upgrade Center",
+      SubTitle: "Paid upgrade is coming soon",
+      Description:
+        "The paid upgrade flow is under development and is not available yet.",
+      BackToProfile: "Back to Profile",
+    },
     Gender: {
       Title: "Gender",
       SubTitle: "You can edit without signing in",
@@ -273,6 +280,8 @@ const en: LocaleType = {
         "Saved locally. It will sync after signing in, and clearing cache will lose it.",
       Synced: "Settings synced to backend",
       SyncFailed: "Sync failed. Saved locally instead.",
+      UpgradeLoginRequired:
+        "Please sign in before managing subscription levels.",
     },
   },
   Settings: {

@@ -48,6 +48,7 @@ export enum Path {
   Chat = "/chat",
   Settings = "/settings",
   Profile = "/profile",
+  Upgrade = "/upgrade",
   NewChat = "/new-chat",
   Masks = "/masks",
   Plugins = "/plugins",
