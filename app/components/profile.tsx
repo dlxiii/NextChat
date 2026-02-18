@@ -57,6 +57,24 @@ function isAtMaxLevel(value: string, list: string[]) {
   return index >= list.length - 1 && index !== -1;
 }
 
+/**
+ * 统一处理等级升级入口。
+ * 未登录时引导登录；已登录时跳转到待开发的升级页面。
+ */
+function createUpgradeHandler(
+  isLoggedIn: boolean,
+  navigate: ReturnType<typeof useNavigate>,
+) {
+  return () => {
+    if (!isLoggedIn) {
+      showToast(Locale.Profile.Toasts.UpgradeLoginRequired);
+      navigate(Path.Auth);
+      return;
+    }
+    navigate(Path.Upgrade);
+  };
+}
+
 export function Profile() {
   const navigate = useNavigate();
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
@@ -284,6 +302,7 @@ export function Profile() {
   );
   const paidAtMax = isAtMaxLevel(normalizedPaidLevel, PAID_LEVELS);
   const serviceAtMax = isAtMaxLevel(normalizedServiceLevel, SERVICE_LEVELS);
+  const goToUpgradePage = createUpgradeHandler(isLoggedIn, navigate);
 
   return (
     <ErrorBoundary>
@@ -382,11 +401,7 @@ export function Profile() {
                 }
                 type="primary"
                 disabled={paidAtMax}
-                onClick={() =>
-                  updateProfile((profile) => {
-                    profile.paidLevel = nextPaidLevel;
-                  })
-                }
+                onClick={goToUpgradePage}
               />
             </div>
           </ListItem>
@@ -404,11 +419,7 @@ export function Profile() {
                 }
                 type="primary"
                 disabled={serviceAtMax}
-                onClick={() =>
-                  updateProfile((profile) => {
-                    profile.serviceLevel = nextServiceLevel;
-                  })
-                }
+                onClick={goToUpgradePage}
               />
             </div>
           </ListItem>
