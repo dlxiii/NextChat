@@ -26,51 +26,6 @@ export function AuthCredentialsPage() {
     }
   }, [navigate]);
 
-  useEffect(() => {
-    /**
-     * OAuth 会话接管流程：
-     * 1) Google 回调后，后端会把 token 暂存在 HttpOnly cookie。
-     * 2) 前端进入 /auth 后调用本接口读取该临时会话。
-     * 3) 成功后沿用现有账号密码登录的持久化逻辑。
-     */
-    const consumeOAuthSession = async () => {
-      const response = await fetch("/api/auth/oauth-session", {
-        method: "GET",
-      });
-      if (!response.ok) return;
-      const data = (await response.json()) as {
-        ok?: boolean;
-        remember?: boolean;
-        session?: {
-          access_token?: string;
-          token_type?: string;
-          email?: string;
-          userId?: string;
-          roles?: string[];
-          plan?: string;
-        };
-      };
-
-      if (!data.ok || !data.session?.access_token) return;
-
-      persistAuthSession(
-        {
-          accessToken: data.session.access_token,
-          tokenType: data.session.token_type,
-          email: data.session.email,
-          userId: data.session.userId,
-          roles: data.session.roles,
-          plan: data.session.plan,
-        },
-        Boolean(data.remember),
-      );
-      showToast(Locale.AuthCredential.Success);
-      navigate(Path.Chat);
-    };
-
-    void consumeOAuthSession();
-  }, [navigate]);
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -175,11 +130,6 @@ export function AuthCredentialsPage() {
     setIsSubmitting(false);
     setPassword("");
     setConfirmPassword("");
-  };
-
-  const handleGoogleOAuth = () => {
-    const rememberFlag = remember && mode === "login" ? "1" : "0";
-    window.location.href = `/api/auth/google/start?remember=${rememberFlag}`;
   };
 
   const submitLabel =
@@ -316,7 +266,6 @@ export function AuthCredentialsPage() {
 
             <IconButton
               type="primary"
-              nativeType="submit"
               text={submitLabel}
               className={styles["auth-credentials-submit"]}
               disabled={isSubmitting}
@@ -327,10 +276,7 @@ export function AuthCredentialsPage() {
             </div>
 
             <div className={styles["auth-credentials-oauth"]}>
-              <IconButton
-                text={Locale.AuthCredential.OAuthGoogle}
-                onClick={handleGoogleOAuth}
-              />
+              <IconButton text={Locale.AuthCredential.OAuthGoogle} disabled />
               <IconButton text={Locale.AuthCredential.OAuthApple} disabled />
               <IconButton
                 text={Locale.AuthCredential.OAuthMicrosoft}
