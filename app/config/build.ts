@@ -54,6 +54,13 @@ export const getBuildConfig = () => {
       showUpdateSection: enabledByEnv(
         process.env.ENABLE_SETTINGS_UPDATE_SECTION,
       ),
+      showSaasSection: enabledByEnv(process.env.ENABLE_SETTINGS_SAAS_SECTION),
+      showCustomEndpointSection: enabledByEnv(
+        process.env.ENABLE_SETTINGS_CUSTOM_ENDPOINT_SECTION,
+      ),
+      showCustomModelSection: enabledByEnv(
+        process.env.ENABLE_SETTINGS_CUSTOM_MODEL_SECTION,
+      ),
     },
   };
 };

@@ -37,13 +37,13 @@
 
 ### 5.1 服务接入与 API 配置
 
-- **立即开始（SaaS 引导）**：跳转到托管服务入口。
+- **立即开始（SaaS 引导）**：跳转到托管服务入口（可通过环境变量隐藏）。
 - **访问码**：输入访问控制码（当服务端启用访问控制时可见）。
-- **自定义 Endpoint 开关**：是否使用自定义 API 配置。
+- **自定义 Endpoint 开关**：是否使用自定义 API 配置（可通过环境变量隐藏）。
 - **Provider 选择**：选择 OpenAI / Azure / Google / Anthropic / Baidu / ByteDance / Alibaba / Tencent / Moonshot / DeepSeek / xAI / ChatGLM / SiliconFlow / 302.AI 等。
 - **各 Provider 参数项**：按供应商展示对应的 URL、Key、Version 等字段。
 - **余额查询**：在允许时可手动触发余额/用量刷新。
-- **自定义模型字符串**：通过逗号输入自定义模型列表。
+- **自定义模型字符串**：通过逗号输入自定义模型列表（可通过环境变量隐藏）。
 
 ### 5.2 模型高级参数（可通过环境变量隐藏）
 
@@ -84,5 +84,16 @@
 - `ENABLE_SETTINGS_REALTIME_SECTION`：显示“实时聊天”。
 - `ENABLE_SETTINGS_TTS_SECTION`：显示“TTS（启用文本转语音、速度等）”。
 - `ENABLE_SETTINGS_UPDATE_SECTION`：显示“当前版本 / 检查更新”。
+- `ENABLE_SETTINGS_SAAS_SECTION`：显示“使用 NextChat AI（SaaS 引导）”。
+- `ENABLE_SETTINGS_CUSTOM_ENDPOINT_SECTION`：显示“自定义接口（Custom Endpoint）”。
+- `ENABLE_SETTINGS_CUSTOM_MODEL_SECTION`：显示“自定义模型名（自定义模型字符串）”。
 
 可在 `.env` 中配置，或在部署平台环境变量中配置。
+
+
+## 11. 头像相关说明（当前临时策略）
+
+- Settings 页面中的“头像”配置项已临时隐藏。
+- 用户资料页面中的“头像”配置项已临时隐藏。
+- 左侧边栏头像与用户头像展示已统一为固定图标，不再显示/使用用户自定义头像。
+- 以上仅为临时关闭，代码未删除，可按需恢复。
