@@ -17,7 +17,7 @@ import MaskIcon from "../icons/mask.svg";
 
 import Locale from "../locales";
 
-import { DEFAULT_CONFIG, useAppConfig, useChatStore } from "../store";
+import { useAppConfig, useChatStore } from "../store";
 
 import {
   DEFAULT_SIDEBAR_WIDTH,
@@ -37,18 +37,6 @@ import { Selector, showConfirm } from "./ui-lib";
 import clsx from "clsx";
 import { isMcpEnabled } from "../mcp/actions";
 import { Avatar } from "./emoji";
-
-const PROFILE_AVATARS = [
-  "1f680",
-  "1f60e",
-  "1f47e",
-  "1f981",
-  "1f409",
-  "1f31f",
-  "1f680",
-  "1f984",
-  "1f47d",
-];
 
 const DISCOVERY = [
   { name: Locale.Plugin.Name, path: Path.Plugins },
@@ -247,22 +235,9 @@ export function SideBar(props: { className?: string }) {
   const [showDiscoverySelector, setshowDiscoverySelector] = useState(false);
   const navigate = useNavigate();
   const config = useAppConfig();
-  const { avatar, update } = config;
+  const { avatar } = config;
   const chatStore = useChatStore();
   const [mcpEnabled, setMcpEnabled] = useState(false);
-  const hasAssignedRandomAvatar = useRef(false);
-
-  useEffect(() => {
-    if (hasAssignedRandomAvatar.current) return;
-    if (avatar === DEFAULT_CONFIG.avatar) {
-      hasAssignedRandomAvatar.current = true;
-      const randomAvatar =
-        PROFILE_AVATARS[Math.floor(Math.random() * PROFILE_AVATARS.length)];
-      update((config) => {
-        config.avatar = randomAvatar;
-      });
-    }
-  }, [avatar, update]);
 
   useEffect(() => {
     // 检查 MCP 是否启用

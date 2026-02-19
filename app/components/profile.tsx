@@ -5,12 +5,12 @@ import styles from "./profile.module.scss";
 import CloseIcon from "../icons/close.svg";
 
 import { IconButton } from "./button";
-import { List, ListItem, Popover, Select, showToast } from "./ui-lib";
+import { List, ListItem, Select, showToast } from "./ui-lib";
 
 import { ErrorBoundary } from "./error";
 import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
-import { Avatar, AvatarPicker } from "./emoji";
+import { Avatar } from "./emoji";
 import { DEFAULT_PROFILE, useAppConfig, useProfileStore } from "../store";
 import Locale from "../locales";
 import { clearAuthSession, getAuthSession } from "../utils/auth-session";
@@ -77,7 +77,6 @@ function createUpgradeHandler(
 
 export function Profile() {
   const navigate = useNavigate();
-  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const config = useAppConfig();
   const displayName = useProfileStore((state) => state.displayName);
   const preferredLanguage = useProfileStore((state) => state.preferredLanguage);
@@ -343,31 +342,7 @@ export function Profile() {
           </div>
         </div>
         <List>
-          <ListItem title={Locale.Profile.Avatar}>
-            <Popover
-              onClose={() => setShowAvatarPicker(false)}
-              content={
-                <AvatarPicker
-                  onEmojiClick={(avatar: string) => {
-                    config.update((config) => (config.avatar = avatar));
-                    setShowAvatarPicker(false);
-                  }}
-                />
-              }
-              open={showAvatarPicker}
-            >
-              <div
-                aria-label={Locale.Profile.AvatarLabel}
-                tabIndex={0}
-                className={styles.avatar}
-                onClick={() => {
-                  setShowAvatarPicker(!showAvatarPicker);
-                }}
-              >
-                <Avatar avatar={config.avatar} />
-              </div>
-            </Popover>
-          </ListItem>
+          {/* Avatar configuration is intentionally hidden for now. */}
           <ListItem title={Locale.Profile.Email} subTitle={emailSubtitle}>
             {isLoggedIn ? (
               <IconButton
