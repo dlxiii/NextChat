@@ -4,6 +4,7 @@ import styles from "./home.module.scss";
 
 import { IconButton } from "./button";
 import SettingsIcon from "../icons/settings.svg";
+import ProfileIcon from "../icons/profile.svg";
 import ChatGptIcon from "../icons/chatgpt.svg";
 import AddIcon from "../icons/add.svg";
 import DeleteIcon from "../icons/delete.svg";
@@ -36,7 +37,6 @@ import dynamic from "next/dynamic";
 import { Selector, showConfirm } from "./ui-lib";
 import clsx from "clsx";
 import { isMcpEnabled } from "../mcp/actions";
-import { Avatar } from "./emoji";
 
 const DISCOVERY = [
   { name: Locale.Plugin.Name, path: Path.Plugins },
@@ -235,7 +235,6 @@ export function SideBar(props: { className?: string }) {
   const [showDiscoverySelector, setshowDiscoverySelector] = useState(false);
   const navigate = useNavigate();
   const config = useAppConfig();
-  const { avatar } = config;
   const chatStore = useChatStore();
   const [mcpEnabled, setMcpEnabled] = useState(false);
 
@@ -341,7 +340,7 @@ export function SideBar(props: { className?: string }) {
                   aria="用户资料"
                   icon={
                     <div className={styles["sidebar-profile-avatar"]}>
-                      <Avatar avatar={avatar} />
+                      <ProfileIcon />
                     </div>
                   }
                   shadow
