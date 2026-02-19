@@ -250,6 +250,7 @@ export function MaskConfig(props: {
         <ModelConfigList
           modelConfig={{ ...props.mask.modelConfig }}
           updateConfig={updateConfig}
+          hideAdvancedForSession={props.shouldSyncFromGlobal}
         />
         {props.extraListItems}
       </List>
