@@ -96,6 +96,13 @@ declare global {
       DEFAULT_INPUT_TEMPLATE?: string;
 
       ENABLE_MCP?: string; // enable mcp functionality
+
+      // settings page section visibility toggles
+      ENABLE_SETTINGS_SYNC_SECTION?: string;
+      ENABLE_SETTINGS_MODEL_SECTION?: string;
+      ENABLE_SETTINGS_REALTIME_SECTION?: string;
+      ENABLE_SETTINGS_TTS_SECTION?: string;
+      ENABLE_SETTINGS_UPDATE_SECTION?: string;
     }
   }
 }
