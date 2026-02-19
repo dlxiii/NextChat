@@ -51,6 +51,9 @@ export const getBuildConfig = () => {
         process.env.ENABLE_SETTINGS_REALTIME_SECTION,
       ),
       showTTSSection: enabledByEnv(process.env.ENABLE_SETTINGS_TTS_SECTION),
+      showUpdateSection: enabledByEnv(
+        process.env.ENABLE_SETTINGS_UPDATE_SECTION,
+      ),
     },
   };
 };

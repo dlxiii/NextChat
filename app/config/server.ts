@@ -102,6 +102,7 @@ declare global {
       ENABLE_SETTINGS_MODEL_SECTION?: string;
       ENABLE_SETTINGS_REALTIME_SECTION?: string;
       ENABLE_SETTINGS_TTS_SECTION?: string;
+      ENABLE_SETTINGS_UPDATE_SECTION?: string;
     }
   }
 }
