@@ -11,6 +11,8 @@ export const getBuildConfig = () => {
   const buildMode = process.env.BUILD_MODE ?? "standalone";
   const isApp = !!process.env.BUILD_APP;
   const version = "v" + tauriConfig.package.version;
+  const enabledByEnv = (value?: string) =>
+    value === "1" || value?.toLowerCase() === "true";
 
   const commitInfo = (() => {
     try {
@@ -40,6 +42,26 @@ export const getBuildConfig = () => {
     buildMode,
     isApp,
     template: process.env.DEFAULT_INPUT_TEMPLATE ?? DEFAULT_INPUT_TEMPLATE,
+    settingsVisibility: {
+      // These switches default to `false` so the related settings sections are
+      // temporarily hidden unless explicitly enabled via environment variables.
+      showSyncSection: enabledByEnv(process.env.ENABLE_SETTINGS_SYNC_SECTION),
+      showModelSection: enabledByEnv(process.env.ENABLE_SETTINGS_MODEL_SECTION),
+      showRealtimeSection: enabledByEnv(
+        process.env.ENABLE_SETTINGS_REALTIME_SECTION,
+      ),
+      showTTSSection: enabledByEnv(process.env.ENABLE_SETTINGS_TTS_SECTION),
+      showUpdateSection: enabledByEnv(
+        process.env.ENABLE_SETTINGS_UPDATE_SECTION,
+      ),
+      showSaasSection: enabledByEnv(process.env.ENABLE_SETTINGS_SAAS_SECTION),
+      showCustomEndpointSection: enabledByEnv(
+        process.env.ENABLE_SETTINGS_CUSTOM_ENDPOINT_SECTION,
+      ),
+      showCustomModelSection: enabledByEnv(
+        process.env.ENABLE_SETTINGS_CUSTOM_MODEL_SECTION,
+      ),
+    },
   };
 };
 
