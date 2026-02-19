@@ -68,7 +68,10 @@ export function Avatar(props: { model?: ModelType; avatar?: string }) {
       LlmIcon = BotIconClaude;
     } else if (modelName.includes("llama")) {
       LlmIcon = BotIconMeta;
-    } else if (modelName.startsWith("mixtral") || modelName.startsWith("codestral")) {
+    } else if (
+      modelName.startsWith("mixtral") ||
+      modelName.startsWith("codestral")
+    ) {
       LlmIcon = BotIconMistral;
     } else if (modelName.includes("deepseek")) {
       LlmIcon = BotIconDeepseek;
@@ -99,9 +102,13 @@ export function Avatar(props: { model?: ModelType; avatar?: string }) {
     );
   }
 
+  // Temporary avatar freeze:
+  // - keep bot/model icons unchanged (handled above via `model`),
+  // - render a fixed icon for user/profile/sidebar avatar slots,
+  // so avatar customization can be disabled globally without deleting code.
   return (
-    <div className="user-avatar">
-      {props.avatar && <EmojiAvatar avatar={props.avatar} />}
+    <div className="no-dark">
+      <BotIconDefault className="user-avatar" width={30} height={30} />
     </div>
   );
 }
