@@ -10,7 +10,6 @@ import { List, ListItem, Select, showToast } from "./ui-lib";
 import { ErrorBoundary } from "./error";
 import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
-import { Avatar } from "./emoji";
 import { DEFAULT_PROFILE, useAppConfig, useProfileStore } from "../store";
 import Locale from "../locales";
 import { clearAuthSession, getAuthSession } from "../utils/auth-session";
@@ -327,9 +326,6 @@ export function Profile() {
       </div>
       <div className={styles.profile}>
         <div className={styles["profile-summary"]}>
-          <div className={styles["profile-avatar"]}>
-            <Avatar avatar={config.avatar} />
-          </div>
           <div>
             <div className={styles["profile-name"]}>
               {displayName || DEFAULT_PROFILE.displayName}
