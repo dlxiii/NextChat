@@ -1592,6 +1592,12 @@ function _Chat() {
 
   const [showChatSidePanel, setShowChatSidePanel] = useState(false);
 
+  const onHexagramEdit = async () => {
+    const value = await showPrompt("请输入修改说明（例如：改成未来三个月）");
+    if (!value) return;
+    chatStore.onHexagramControl("edit_intent", undefined, value);
+  };
+
   return (
     <>
       <div className={styles.chat} key={session.id}>
@@ -1934,6 +1940,45 @@ function _Chat() {
                               </div>
                             )}
                           </div>
+                          {message.role === "assistant" &&
+                            i === messages.length - 1 &&
+                            session.hexagramState?.status === "confirming" &&
+                            !message.streaming && (
+                              <div className={styles["hexagram-confirm-card"]}>
+                                <div
+                                  className={styles["hexagram-confirm-title"]}
+                                >
+                                  请确认本轮起卦意图
+                                </div>
+                                <div
+                                  className={styles["hexagram-confirm-actions"]}
+                                >
+                                  <IconButton
+                                    bordered
+                                    text="确认"
+                                    icon={<ConfirmIcon />}
+                                    onClick={() =>
+                                      chatStore.onHexagramControl(
+                                        "confirm_intent",
+                                      )
+                                    }
+                                  />
+                                  <IconButton
+                                    bordered
+                                    text="修改"
+                                    icon={<EditIcon />}
+                                    onClick={onHexagramEdit}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          {message.role === "assistant" &&
+                            i === messages.length - 1 &&
+                            session.hexagramState?.status === "blocked" && (
+                              <div className={styles["hexagram-blocked"]}>
+                                当前请求被阻断，请按提示修改问题后重试。
+                              </div>
+                            )}
                           {message?.audio_url && (
                             <div className={styles["chat-message-audio"]}>
                               <audio src={message.audio_url} controls />

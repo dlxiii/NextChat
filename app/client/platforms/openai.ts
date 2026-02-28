@@ -8,6 +8,7 @@ import {
   Azure,
   REQUEST_TIMEOUT_MS,
   ServiceProvider,
+  HEXAGRAM_BASE_URL,
 } from "@/app/constant";
 import {
   ChatMessageTool,
@@ -55,6 +56,8 @@ export interface OpenAIListModelResponse {
 }
 
 export interface RequestPayload {
+  conversation_id?: string;
+  intent_partial?: Record<string, any>;
   messages: {
     role: "developer" | "system" | "user" | "assistant";
     content: string | MultimodalContent[];
@@ -69,6 +72,12 @@ export interface RequestPayload {
   max_completion_tokens?: number;
 }
 
+const HEXAGRAM_MODELS = new Set(["hexagram", "liuyao"]);
+
+function isHexagramModel(model: string) {
+  return HEXAGRAM_MODELS.has(model);
+}
+
 export interface DalleRequestPayload {
   model: string;
   prompt: string;
@@ -81,6 +90,20 @@ export interface DalleRequestPayload {
 
 export class ChatGPTApi implements LLMApi {
   private disableListModels = true;
+
+  /**
+   * Build OpenAI-compatible endpoint URL for hexagram single-entry chat mode.
+   *
+   * The backend requires:
+   * - base url: https://api.hexagram.work/v1
+   * - path: /chat/completions
+   */
+  private hexagramPath() {
+    const baseUrl = HEXAGRAM_BASE_URL.endsWith("/")
+      ? HEXAGRAM_BASE_URL.slice(0, -1)
+      : HEXAGRAM_BASE_URL;
+    return `${baseUrl}/chat/completions`;
+  }
 
   path(path: string): string {
     const accessStore = useAccessStore.getState();
@@ -200,7 +223,7 @@ export class ChatGPTApi implements LLMApi {
       options.config.model.startsWith("o1") ||
       options.config.model.startsWith("o3") ||
       options.config.model.startsWith("o4-mini");
-    const isGpt5 =  options.config.model.startsWith("gpt-5");
+    const isGpt5 = options.config.model.startsWith("gpt-5");
     if (isDalle3) {
       const prompt = getMessageTextContent(
         options.messages.slice(-1)?.pop() as any,
@@ -231,7 +254,7 @@ export class ChatGPTApi implements LLMApi {
         messages,
         stream: options.config.stream,
         model: modelConfig.model,
-        temperature: (!isO1OrO3 && !isGpt5) ? modelConfig.temperature : 1,
+        temperature: !isO1OrO3 && !isGpt5 ? modelConfig.temperature : 1,
         presence_penalty: !isO1OrO3 ? modelConfig.presence_penalty : 0,
         frequency_penalty: !isO1OrO3 ? modelConfig.frequency_penalty : 0,
         top_p: !isO1OrO3 ? modelConfig.top_p : 1,
@@ -240,11 +263,10 @@ export class ChatGPTApi implements LLMApi {
       };
 
       if (isGpt5) {
-  	// Remove max_tokens if present
-  	delete requestPayload.max_tokens;
-  	// Add max_completion_tokens (or max_completion_tokens if that's what you meant)
-  	requestPayload["max_completion_tokens"] = modelConfig.max_tokens;
-
+        // Remove max_tokens if present
+        delete requestPayload.max_tokens;
+        // Add max_completion_tokens (or max_completion_tokens if that's what you meant)
+        requestPayload["max_completion_tokens"] = modelConfig.max_tokens;
       } else if (isO1OrO3) {
         // by default the o1/o3 models will not attempt to produce output that includes markdown formatting
         // manually add "Formatting re-enabled" developer message to encourage markdown inclusion in model responses
@@ -258,16 +280,26 @@ export class ChatGPTApi implements LLMApi {
         requestPayload["max_completion_tokens"] = modelConfig.max_tokens;
       }
 
-
       // add max_tokens to vision model
-      if (visionModel && !isO1OrO3 && ! isGpt5) {
+      if (visionModel && !isO1OrO3 && !isGpt5) {
         requestPayload["max_tokens"] = Math.max(modelConfig.max_tokens, 4000);
+      }
+    }
+
+    const shouldUseHexagramFlow = isHexagramModel(modelConfig.model);
+
+    if (!isDalle3 && shouldUseHexagramFlow) {
+      const hexagramPayload = requestPayload as RequestPayload;
+      hexagramPayload.conversation_id = options.conversationId;
+      if (options.intentPartial) {
+        hexagramPayload.intent_partial = options.intentPartial;
       }
     }
 
     console.log("[Request] openai payload: ", requestPayload);
 
-    const shouldStream = !isDalle3 && !!options.config.stream;
+    const shouldStream =
+      !isDalle3 && !!options.config.stream && !shouldUseHexagramFlow;
     const controller = new AbortController();
     options.onController?.(controller);
 
@@ -299,9 +331,9 @@ export class ChatGPTApi implements LLMApi {
           ),
         );
       } else {
-        chatPath = this.path(
-          isDalle3 ? OpenaiPath.ImagePath : OpenaiPath.ChatPath,
-        );
+        chatPath = shouldUseHexagramFlow
+          ? this.hexagramPath()
+          : this.path(isDalle3 ? OpenaiPath.ImagePath : OpenaiPath.ChatPath);
       }
       if (shouldStream) {
         let index = -1;
@@ -420,6 +452,9 @@ export class ChatGPTApi implements LLMApi {
         clearTimeout(requestTimeoutId);
 
         const resJson = await res.json();
+        if (resJson?.hexagram_state) {
+          options.onHexagramState?.(resJson.hexagram_state);
+        }
         const message = await this.extractMessage(resJson);
         options.onFinish(message, res);
       }
