@@ -10,6 +10,64 @@ import { PasswordInput } from "./ui-lib";
 import clsx from "clsx";
 import { getAuthSession, persistAuthSession } from "../utils/auth-session";
 
+type AuthLoginPayload = {
+  accessToken: string;
+  tokenType?: string;
+  email?: string;
+  userId?: string;
+  roles?: string[];
+  plan?: string;
+};
+
+/**
+ * Normalize login API response into a stable local auth session payload.
+ *
+ * Why this exists:
+ * - Different auth backends may return snake_case / camelCase / nested token fields.
+ * - We must persist a valid access token before redirecting users to chat,
+ *   otherwise users "look logged in" but still fail model requests.
+ *
+ * Resolution flow:
+ * 1) Try reading token fields from the root response object.
+ * 2) If not found, retry from common nested containers (`data`, `result`).
+ * 3) Return `null` when no token is available so caller can treat login as failed.
+ */
+function normalizeAuthLoginPayload(
+  responseJson: Record<string, unknown> | null,
+): AuthLoginPayload | null {
+  if (!responseJson) return null;
+
+  const candidates = [
+    responseJson,
+    (responseJson.data as Record<string, unknown> | undefined) ?? null,
+    (responseJson.result as Record<string, unknown> | undefined) ?? null,
+  ].filter(Boolean) as Record<string, unknown>[];
+
+  for (const source of candidates) {
+    const accessToken =
+      (source.access_token as string | undefined) ??
+      (source.accessToken as string | undefined) ??
+      (source.token as string | undefined);
+
+    if (!accessToken) continue;
+
+    return {
+      accessToken,
+      tokenType:
+        (source.token_type as string | undefined) ??
+        (source.tokenType as string | undefined),
+      email: source.email as string | undefined,
+      userId:
+        (source.userId as string | undefined) ??
+        (source.user_id as string | undefined),
+      roles: source.roles as string[] | undefined,
+      plan: source.plan as string | undefined,
+    };
+  }
+
+  return null;
+}
+
 export function AuthCredentialsPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -89,18 +147,22 @@ export function AuthCredentialsPage() {
         throw new Error(responseText);
       }
 
-      if (mode === "login" && responseJson?.access_token) {
+      const normalizedLoginPayload = normalizeAuthLoginPayload(responseJson);
+
+      if (mode === "login" && normalizedLoginPayload) {
         persistAuthSession(
           {
-            accessToken: responseJson.access_token as string,
-            tokenType: responseJson.token_type as string | undefined,
-            email: responseJson.email as string | undefined,
-            userId: responseJson.userId as string | undefined,
-            roles: responseJson.roles as string[] | undefined,
-            plan: responseJson.plan as string | undefined,
+            accessToken: normalizedLoginPayload.accessToken,
+            tokenType: normalizedLoginPayload.tokenType,
+            email: normalizedLoginPayload.email,
+            userId: normalizedLoginPayload.userId,
+            roles: normalizedLoginPayload.roles,
+            plan: normalizedLoginPayload.plan,
           },
           remember,
         );
+      } else if (mode === "login") {
+        throw new Error("missing access token in login response");
       }
 
       showToast(
