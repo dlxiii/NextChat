@@ -24,11 +24,24 @@ function parseApiKey(bearToken: string) {
   };
 }
 
+/**
+ * Detect whether request carries first-party login credential.
+ *
+ * `X-Hexagram-Auth` is intentionally separated from provider Authorization headers.
+ * This keeps upstream provider API authentication and product-level login authentication
+ * independent, so a user login token will not be mistaken as OpenAI-compatible API key.
+ */
+function hasSessionAuth(req: NextRequest) {
+  const sessionAuth = req.headers.get("x-hexagram-auth") ?? "";
+  return Boolean(sessionAuth.trim());
+}
+
 export function auth(req: NextRequest, modelProvider: ModelProvider) {
   const authToken = req.headers.get("Authorization") ?? "";
 
   // check if it is openai api key or user token
   const { accessCode, apiKey } = parseApiKey(authToken);
+  const hasLoggedInSession = hasSessionAuth(req);
 
   const hashedCode = md5.hash(accessCode ?? "").trim();
 
@@ -39,7 +52,12 @@ export function auth(req: NextRequest, modelProvider: ModelProvider) {
   console.log("[User IP] ", getIP(req));
   console.log("[Time] ", new Date().toLocaleString());
 
-  if (serverConfig.needCode && !serverConfig.codes.has(hashedCode) && !apiKey) {
+  if (
+    serverConfig.needCode &&
+    !serverConfig.codes.has(hashedCode) &&
+    !apiKey &&
+    !hasLoggedInSession
+  ) {
     return {
       error: true,
       msg: !accessCode ? "empty access code" : "wrong access code",

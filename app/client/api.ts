@@ -25,6 +25,7 @@ import { XAIApi } from "./platforms/xai";
 import { ChatGLMApi } from "./platforms/glm";
 import { SiliconflowApi } from "./platforms/siliconflow";
 import { Ai302Api } from "./platforms/ai302";
+import { getAuthSession } from "../utils/auth-session";
 
 export const ROLES = ["system", "user", "assistant"] as const;
 export type MessageRole = (typeof ROLES)[number];
@@ -363,6 +364,23 @@ export function getHeaders(ignoreHeaders: boolean = false) {
     headers["Authorization"] = getBearerToken(
       ACCESS_CODE_PREFIX + accessStore.accessCode,
     );
+  }
+
+  /**
+   * Attach first-party login credential for server-side entitlement checks.
+   *
+   * Why this header exists:
+   * 1) Logged-in users should be recognized by our own backend, even when they do not input a raw provider API key.
+   * 2) We must avoid overloading the `Authorization` header because it is reserved for upstream model providers
+   *    (OpenAI/Azure/Anthropic/etc.) and may otherwise block system key injection.
+   * 3) The server consumes `X-Hexagram-Auth` only for app-level authentication/authorization,
+   *    and keeps provider auth header generation independent and deterministic.
+   */
+  const authSession = getAuthSession();
+  if (authSession?.accessToken) {
+    headers["X-Hexagram-Auth"] = `${authSession.tokenType ?? "Bearer"} ${
+      authSession.accessToken
+    }`;
   }
 
   return headers;
