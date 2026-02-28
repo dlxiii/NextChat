@@ -1,19 +1,23 @@
 import { NextRequest } from "next/server";
 import { HEXAGRAM_BASE_URL } from "@/app/constant";
+import { fetchWithOptionalProxy } from "@/app/utils/proxy-fetch";
 
 const AUTH_BASE_URL = HEXAGRAM_BASE_URL.replace(/\/$/, "");
 
 async function proxyAuth(req: NextRequest, action: "login" | "register") {
-  const response = await fetch(`${AUTH_BASE_URL}/auth/${action}`, {
-    method: req.method,
-    headers: {
-      "Content-Type": req.headers.get("Content-Type") ?? "application/json",
+  const requestBody = await req.text();
+
+  const response = await fetchWithOptionalProxy(
+    `${AUTH_BASE_URL}/auth/${action}`,
+    {
+      method: req.method,
+      headers: {
+        "Content-Type": req.headers.get("Content-Type") ?? "application/json",
+      },
+      body: requestBody,
+      redirect: "manual",
     },
-    body: req.body,
-    redirect: "manual",
-    // @ts-ignore
-    duplex: "half",
-  });
+  );
 
   const headers = new Headers(response.headers);
   headers.delete("www-authenticate");
