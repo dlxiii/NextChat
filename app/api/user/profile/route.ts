@@ -1,20 +1,24 @@
 import { NextRequest } from "next/server";
 import { HEXAGRAM_BASE_URL } from "@/app/constant";
+import { fetchWithOptionalProxy } from "@/app/utils/proxy-fetch";
 
 const USER_BASE_URL = HEXAGRAM_BASE_URL.replace(/\/$/, "");
 
 async function proxyProfile(req: NextRequest) {
-  const response = await fetch(`${USER_BASE_URL}/api/user/profile`, {
-    method: req.method,
-    headers: {
-      "Content-Type": req.headers.get("Content-Type") ?? "application/json",
-      Authorization: req.headers.get("Authorization") ?? "",
+  const requestBody = req.method === "GET" ? undefined : await req.text();
+
+  const response = await fetchWithOptionalProxy(
+    `${USER_BASE_URL}/api/user/profile`,
+    {
+      method: req.method,
+      headers: {
+        "Content-Type": req.headers.get("Content-Type") ?? "application/json",
+        Authorization: req.headers.get("Authorization") ?? "",
+      },
+      body: requestBody,
+      redirect: "manual",
     },
-    body: req.body,
-    redirect: "manual",
-    // @ts-ignore
-    duplex: "half",
-  });
+  );
 
   const headers = new Headers(response.headers);
   headers.delete("www-authenticate");
