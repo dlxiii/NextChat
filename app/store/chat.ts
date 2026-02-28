@@ -83,6 +83,15 @@ export interface ChatStat {
 
 export interface ChatSession {
   id: string;
+  /**
+   * Stable conversation id for backend single-entry chat mode.
+   *
+   * Lifecycle:
+   * 1. generated once on session creation;
+   * 2. persisted with the session state;
+   * 3. reused for every request in the same session.
+   */
+  conversationId: string;
   topic: string;
 
   memoryPrompt: string;
@@ -91,6 +100,13 @@ export interface ChatSession {
   lastUpdate: number;
   lastSummarizeIndex: number;
   clearContextIndex?: number;
+
+  /**
+   * Persisted extra state returned by hexagram-compatible backends.
+   * It is intentionally stored at session level so confirm/edit actions can
+   * survive refresh and continue on another frontend instance.
+   */
+  hexagramState?: Record<string, any>;
 
   mask: Mask;
 }
@@ -104,6 +120,7 @@ export const BOT_HELLO: ChatMessage = createMessage({
 function createEmptySession(): ChatSession {
   return {
     id: nanoid(),
+    conversationId: `conv-${nanoid()}`,
     topic: DEFAULT_TOPIC,
     memoryPrompt: "",
     messages: [],
@@ -117,6 +134,10 @@ function createEmptySession(): ChatSession {
 
     mask: createEmptyMask(),
   };
+}
+
+function isHexagramModel(model: string) {
+  return model === "hexagram" || model === "liuyao";
 }
 
 function getSummarizeModel(
@@ -457,10 +478,27 @@ export const useChatStore = createPersistStore(
         });
 
         const api: ClientApi = getClientApi(modelConfig.providerName);
+        const shouldUseHexagramFlow = isHexagramModel(modelConfig.model);
         // make request
         api.llm.chat({
           messages: sendMessages,
-          config: { ...modelConfig, stream: true },
+          config: {
+            ...modelConfig,
+            // Hexagram backend requires full JSON response for status and
+            // intent_partial handling, so we turn off SSE for these models.
+            stream: shouldUseHexagramFlow ? false : true,
+          },
+          conversationId: shouldUseHexagramFlow
+            ? session.conversationId
+            : undefined,
+          intentPartial: shouldUseHexagramFlow
+            ? session.hexagramState?.intent_partial
+            : undefined,
+          onHexagramState(hexagramState) {
+            get().updateTargetSession(session, (session) => {
+              session.hexagramState = hexagramState;
+            });
+          },
           onUpdate(message) {
             botMessage.streaming = true;
             if (message) {
@@ -523,6 +561,79 @@ export const useChatStore = createPersistStore(
               botMessage.id ?? messageIndex,
               controller,
             );
+          },
+        });
+      },
+
+      /**
+       * Send structured control messages required by hexagram single-entry API.
+       *
+       * Implementation flow:
+       * 1. Read stable `conversationId` and stored `intent_partial` from session.
+       * 2. Construct a JSON control message (`confirm_intent` / `edit_intent`).
+       * 3. Reuse the same `/chat/completions` request path via existing LLMApi.
+       * 4. Persist latest `hexagram_state` from response for subsequent actions.
+       */
+      async onHexagramControl(
+        action: "confirm_intent" | "edit_intent",
+        edits?: Record<string, any>,
+        messageText?: string,
+      ) {
+        const session = get().currentSession();
+        const modelConfig = session.mask.modelConfig;
+
+        if (!isHexagramModel(modelConfig.model)) return;
+        if (!session.hexagramState?.intent_partial) {
+          showToast("Missing intent_partial, please ask again first.");
+          return;
+        }
+
+        const userMessage = createMessage({
+          role: "user",
+          content: JSON.stringify({
+            action,
+            ...(edits ? { edits } : {}),
+            ...(messageText ? { message: messageText } : {}),
+          }),
+        });
+        const botMessage = createMessage({
+          role: "assistant",
+          streaming: true,
+          model: modelConfig.model,
+        });
+
+        get().updateTargetSession(session, (session) => {
+          session.messages = session.messages.concat([userMessage, botMessage]);
+        });
+
+        const api: ClientApi = getClientApi(modelConfig.providerName);
+        api.llm.chat({
+          messages: [userMessage],
+          config: { ...modelConfig, stream: false },
+          conversationId: session.conversationId,
+          intentPartial: session.hexagramState.intent_partial,
+          onHexagramState(hexagramState) {
+            get().updateTargetSession(session, (session) => {
+              session.hexagramState = hexagramState;
+            });
+          },
+          onFinish(message) {
+            botMessage.streaming = false;
+            botMessage.content = message;
+            botMessage.date = new Date().toLocaleString();
+            get().onNewMessage(botMessage, session);
+            ChatControllerPool.remove(session.id, botMessage.id);
+          },
+          onError(error) {
+            botMessage.content += `\n\n${prettyObject({
+              error: true,
+              message: error.message,
+            })}`;
+            botMessage.streaming = false;
+            botMessage.isError = true;
+            get().updateTargetSession(session, (session) => {
+              session.messages = session.messages.concat();
+            });
           },
         });
       },
@@ -860,7 +971,7 @@ export const useChatStore = createPersistStore(
   },
   {
     name: StoreKey.Chat,
-    version: 3.3,
+    version: 3.4,
     migrate(persistedState, version) {
       const state = persistedState as any;
       const newState = JSON.parse(
@@ -922,6 +1033,14 @@ export const useChatStore = createPersistStore(
           const config = useAppConfig.getState();
           s.mask.modelConfig.compressModel = "";
           s.mask.modelConfig.compressProviderName = "";
+        });
+      }
+
+      if (version < 3.4) {
+        newState.sessions.forEach((s) => {
+          if (!s.conversationId) {
+            s.conversationId = `conv-${nanoid()}`;
+          }
         });
       }
 

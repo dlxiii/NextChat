@@ -76,9 +76,12 @@ export interface SpeechOptions {
 export interface ChatOptions {
   messages: RequestMessage[];
   config: LLMConfig;
+  conversationId?: string;
+  intentPartial?: Record<string, any>;
 
   onUpdate?: (message: string, chunk: string) => void;
   onFinish: (message: string, responseRes: Response) => void;
+  onHexagramState?: (hexagramState: Record<string, any>) => void;
   onError?: (err: Error) => void;
   onController?: (controller: AbortController) => void;
   onBeforeTool?: (tool: ChatMessageTool) => void;

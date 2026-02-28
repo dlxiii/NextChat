@@ -751,3 +751,32 @@
     }
   }
 }
+
+.hexagram-confirm-card {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-in-light);
+  background: var(--white);
+}
+
+.hexagram-confirm-title {
+  font-size: 12px;
+  color: var(--black);
+  opacity: 0.8;
+  margin-bottom: 8px;
+}
+
+.hexagram-confirm-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.hexagram-blocked {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 80, 80, 0.08);
+  color: #b42318;
+  font-size: 12px;
+}

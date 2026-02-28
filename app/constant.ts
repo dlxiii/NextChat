@@ -38,7 +38,7 @@ export const SILICONFLOW_BASE_URL = "https://api.siliconflow.cn";
 
 export const AI302_BASE_URL = "https://api.302.ai";
 export const HEXAGRAM_BASE_URL =
-  process.env.NEXT_PUBLIC_HEXAGRAM_BASE_URL ?? "https://api.hexagram.work";
+  process.env.NEXT_PUBLIC_HEXAGRAM_BASE_URL ?? "https://api.hexagram.work/v1";
 
 export const CACHE_URL_PREFIX = "/api/cache";
 export const UPLOAD_URL = `${CACHE_URL_PREFIX}/upload`;
