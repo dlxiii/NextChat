@@ -92,6 +92,50 @@ export class ChatGPTApi implements LLMApi {
   private disableListModels = true;
 
   /**
+   * Format OpenAI-compatible error payload into a readable markdown block.
+   *
+   * Implementation flow:
+   * 1) Detect whether the upstream error indicates missing API credentials.
+   * 2) Build contextual troubleshooting hints that match NextChat's config model
+   *    (provider key, BASE_URL compatibility, and deployment env sync).
+   * 3) Append the original upstream JSON payload for precise debugging.
+   *
+   * Why this is needed:
+   * - Upstream providers often return a generic "missing API key" string.
+   * - End users may already have entered a key, but in a different provider tab
+   *   or in non-effective deployment environment variables.
+   * - Surfacing targeted hints here reduces repetitive support loops.
+   */
+  private formatProviderError(error: any): string {
+    const errorMessage = String(error?.message ?? "");
+    const errorType = String(error?.type ?? "");
+    const missingApiKey =
+      errorType === "invalid_request_error" &&
+      /didn't provide an api key|provide your api key/i.test(errorMessage);
+
+    if (!missingApiKey) {
+      return "```\n" + JSON.stringify({ error }, null, 4) + "\n```";
+    }
+
+    const troubleshootingTips = [
+      "检测到上游接口未收到有效 API Key（Authorization: Bearer ...）。",
+      "请确认当前模型提供商与填写的 Key 一致（例如 OpenAI/Google/Azure 不可混用）。",
+      "若你使用了自定义 BASE_URL，请确认该地址兼容 OpenAI 接口与 Bearer 鉴权。",
+      "若使用部署环境变量（OPENAI_API_KEY/BASE_URL），修改后需重新部署使其生效。",
+    ];
+
+    return [
+      "### 配置检查建议",
+      ...troubleshootingTips.map((tip, index) => `${index + 1}. ${tip}`),
+      "",
+      "### 上游错误详情",
+      "```json",
+      JSON.stringify({ error }, null, 2),
+      "```",
+    ].join("\n");
+  }
+
+  /**
    * Build OpenAI-compatible endpoint URL for hexagram single-entry chat mode.
    *
    * The backend requires:
@@ -146,7 +190,7 @@ export class ChatGPTApi implements LLMApi {
 
   async extractMessage(res: any) {
     if (res.error) {
-      return "```\n" + JSON.stringify(res, null, 4) + "\n```";
+      return this.formatProviderError(res.error);
     }
     // dalle3 model return url, using url create image message
     if (res.data) {
