@@ -367,20 +367,29 @@ export function getHeaders(ignoreHeaders: boolean = false) {
   }
 
   /**
-   * Attach first-party login credential for server-side entitlement checks.
+   * Build the product-level backend authentication header.
    *
-   * Why this header exists:
-   * 1) Logged-in users should be recognized by our own backend, even when they do not input a raw provider API key.
-   * 2) We must avoid overloading the `Authorization` header because it is reserved for upstream model providers
-   *    (OpenAI/Azure/Anthropic/etc.) and may otherwise block system key injection.
-   * 3) The server consumes `X-Hexagram-Auth` only for app-level authentication/authorization,
-   *    and keeps provider auth header generation independent and deterministic.
+   * Implementation flow:
+   * 1) Prefer the login session token when the user has signed in.
+   * 2) Normalize the scheme to `Bearer` for backend compatibility, regardless of IdP tokenType casing/value.
+   * 3) Return an empty string when no session is available, so callers can skip this header safely.
+   *
+   * Why this is separated from `Authorization`:
+   * - `Authorization` is dedicated to model-provider keys (OpenAI/Azure/Anthropic/...).
+   * - Reusing `Authorization` for product login could break upstream auth forwarding.
    */
-  const authSession = getAuthSession();
-  if (authSession?.accessToken) {
-    headers["X-Hexagram-Auth"] = `${authSession.tokenType ?? "Bearer"} ${
-      authSession.accessToken
-    }`;
+  function getBackendBearerAuthHeader() {
+    const authSession = getAuthSession();
+    if (!authSession?.accessToken) {
+      return "";
+    }
+
+    return `Bearer ${authSession.accessToken}`;
+  }
+
+  const backendBearerAuth = getBackendBearerAuthHeader();
+  if (backendBearerAuth) {
+    headers["X-Hexagram-Auth"] = backendBearerAuth;
   }
 
   return headers;
