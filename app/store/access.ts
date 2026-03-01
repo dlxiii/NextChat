@@ -25,6 +25,7 @@ import { createPersistStore } from "../utils/store";
 import { ensure } from "../utils/clone";
 import { DEFAULT_CONFIG } from "./config";
 import { getModelProvider } from "../utils/model";
+import { getAuthSession } from "../utils/auth-session";
 
 let fetchState = 0; // 0 not fetch, 1 fetching, 2 done
 
@@ -239,6 +240,20 @@ export const useAccessStore = createPersistStore(
     isAuthorized() {
       this.fetch();
 
+      /**
+       * Authorization decision flow:
+       * 1) If a user has configured any provider credential locally, they are authorized.
+       * 2) If server-side access control is disabled, everyone is authorized.
+       * 3) If access-code mode is enabled and a valid code exists locally, user is authorized.
+       * 4) If user has logged in via first-party account system, they are authorized even without provider keys.
+       *
+       * Why step (4) matters:
+       * - In account-login deployments, the backend can inject system API keys after authenticating
+       *   the user's session token (`X-Hexagram-Auth`).
+       * - Requiring users to input OpenAI/other provider keys on the frontend would break this flow.
+       */
+      const hasLoggedInSession = Boolean(getAuthSession()?.accessToken);
+
       // has token or has code or disabled access control
       return (
         this.isValidOpenAI() ||
@@ -256,7 +271,8 @@ export const useAccessStore = createPersistStore(
         this.isValidChatGLM() ||
         this.isValidSiliconFlow() ||
         !this.enabledAccessControl() ||
-        (this.enabledAccessControl() && ensure(get(), ["accessCode"]))
+        (this.enabledAccessControl() && ensure(get(), ["accessCode"])) ||
+        hasLoggedInSession
       );
     },
     fetch() {
