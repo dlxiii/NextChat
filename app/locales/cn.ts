@@ -40,7 +40,7 @@ const cn = {
     RegisterSubmit: "注册",
     RegisterSubmitting: "注册中...",
     Divider: "或使用以下方式继续",
-    OAuthGoogle: "Google（即将上线）",
+    OAuthGoogle: "使用 Google 账号登录",
     OAuthGithub: "GitHub（即将上线）",
     OAuthMicrosoft: "Microsoft（即将上线）",
     OAuthApple: "Apple（即将上线）",
